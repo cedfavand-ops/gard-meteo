@@ -1,0 +1,19 @@
+{
+  "generated_at": "exemple - pas encore généré",
+  "zone": {
+    "nom": "Gard rhodanien",
+    "bbox": {"lat_max": 44.506351, "lon_min": 4.022425, "lat_min": 43.777732, "lon_max": 4.913134}
+  },
+  "stations": [
+    {
+      "id": "bagnols",
+      "nom": "Bagnols-sur-Cèze (exemple)",
+      "lat": 44.1607,
+      "lon": 4.6172,
+      "date_prevue": "demain",
+      "brute": {"tn": 12.0, "tx": 24.0},
+      "corrigee": {"tn": 12.0, "tx": 24.0},
+      "biais_applique": {"tn": 0.0, "tx": 0.0}
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gard rhodanien — Tn/Tx de demain</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --calcaire: #efe9db;
+    --garrigue: #3a4a34;
+    --tuile: #a6543f;
+    --ocre: #c98f2c;
+    --encre: #23281f;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--calcaire);
+    color: var(--encre);
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  header {
+    padding: 1.4rem 1.5rem 1rem;
+    border-bottom: 1px solid rgba(35,40,31,0.15);
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    margin: 0 0 0.2rem;
+    color: var(--garrigue);
+  }
+  .sous-titre {
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(35,40,31,0.7);
+  }
+  #carte {
+    height: calc(100vh - 92px);
+    width: 100%;
+  }
+  .popup-station h3 {
+    font-family: 'Fraunces', serif;
+    margin: 0 0 0.4rem;
+    font-size: 1.05rem;
+  }
+  .popup-temps {
+    display: flex;
+    gap: 1.2rem;
+    margin: 0.3rem 0;
+  }
+  .popup-temps .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+  .popup-temps .label {
+    font-size: 0.72rem;
+    color: rgba(35,40,31,0.6);
+  }
+  .tx .val { color: var(--tuile); }
+  .tn .val { color: var(--garrigue); }
+  .popup-biais {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: rgba(35,40,31,0.65);
+  }
+  .marker-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: white;
+    border-radius: 4px;
+    padding: 1px 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Gard rhodanien — prévisions de demain</h1>
+  <p class="sous-titre" id="sous-titre">ICON‑CH1, corrigé avec l'historique des stations locales</p>
+</header>
+
+<div id="carte"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+async function init() {
+  const zone = {
+    lat_max: 44.506351, lon_min: 4.022425,
+    lat_min: 43.777732, lon_max: 4.913134
+  };
+  const centre = [(zone.lat_max + zone.lat_min) / 2, (zone.lon_min + zone.lon_max) / 2];
+
+  const map = L.map('carte').setView(centre, 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 18
+  }).addTo(map);
+
+  map.fitBounds([[zone.lat_min, zone.lon_min], [zone.lat_max, zone.lon_max]], {padding: [20, 20]});
+
+  let data;
+  try {
+    const res = await fetch('data/latest.json?_=' + Date.now());
+    data = await res.json();
+  } catch (e) {
+    document.getElementById('sous-titre').textContent =
+      "Données pas encore générées — lance le workflow GitHub Actions.";
+    return;
+  }
+
+  if (data.stations && data.stations.length) {
+    document.getElementById('sous-titre').textContent =
+      `Prévision pour le ${data.stations[0].date_prevue} — générée le ${data.generated_at}`;
+  }
+
+  (data.stations || []).forEach(st => {
+    const marker = L.marker([st.lat, st.lon]).addTo(map);
+    marker.bindTooltip(
+      `<div class="marker-label">${st.nom} · ${st.corrigee.tn}° / ${st.corrigee.tx}°</div>`,
+      {permanent: false, direction: 'top', offset: [0, -8]}
+    );
+    marker.bindPopup(`
+      <div class="popup-station">
+        <h3>${st.nom}</h3>
+        <div class="popup-temps">
+          <div class="tn"><div class="val">${st.corrigee.tn}°</div><div class="label">Tn corrigée</div></div>
+          <div class="tx"><div class="val">${st.corrigee.tx}°</div><div class="label">Tx corrigée</div></div>
+        </div>
+        <div class="popup-biais">
+          Prévision brute ICON‑CH1&nbsp;: ${st.brute.tn}° / ${st.brute.tx}°<br>
+          Biais appliqué&nbsp;: ${st.biais_applique.tn >= 0 ? '+' : ''}${st.biais_applique.tn}° / ${st.biais_applique.tx >= 0 ? '+' : ''}${st.biais_applique.tx}°
+        </div>
+      </div>
+    `);
+  });
+}
+
+init();
+</script>
+
+</body>
+</html>

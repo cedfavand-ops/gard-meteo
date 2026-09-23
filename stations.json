@@ -1,0 +1,48 @@
+{
+  "zone": {
+    "nom": "Gard rhodanien",
+    "bbox": {
+      "lat_max": 44.506351,
+      "lon_min": 4.022425,
+      "lat_min": 43.777732,
+      "lon_max": 4.913134
+    }
+  },
+  "stations": [
+    {
+      "id": "bagnols",
+      "nom": "Bagnols-sur-Cèze",
+      "lat": 44.1607,
+      "lon": 4.6172,
+      "infoclimat_id": "A_REMPLIR"
+    },
+    {
+      "id": "pont_saint_esprit",
+      "nom": "Pont-Saint-Esprit",
+      "lat": 44.2555,
+      "lon": 4.6989,
+      "infoclimat_id": "A_REMPLIR"
+    },
+    {
+      "id": "uzes",
+      "nom": "Uzès",
+      "lat": 44.0122,
+      "lon": 4.4196,
+      "infoclimat_id": "A_REMPLIR"
+    },
+    {
+      "id": "villeneuve_lez_avignon",
+      "nom": "Villeneuve-lès-Avignon",
+      "lat": 43.9694,
+      "lon": 4.7947,
+      "infoclimat_id": "A_REMPLIR"
+    },
+    {
+      "id": "roquemaure",
+      "nom": "Roquemaure",
+      "lat": 44.0522,
+      "lon": 4.7756,
+      "infoclimat_id": "A_REMPLIR"
+    }
+  ]
+}
