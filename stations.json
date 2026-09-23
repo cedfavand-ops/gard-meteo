@@ -8,41 +8,36 @@
       "lon_max": 4.913134
     }
   },
+  "_note": "lat/lon/altitude à null seront complétés automatiquement par scripts/fetch_stations_metadata.py une fois la clé Infoclimat configurée. Les valeurs déjà renseignées ont été vérifiées manuellement.",
   "stations": [
-    {
-      "id": "bagnols",
-      "nom": "Bagnols-sur-Cèze",
-      "lat": 44.1607,
-      "lon": 4.6172,
-      "infoclimat_id": "A_REMPLIR"
-    },
-    {
-      "id": "pont_saint_esprit",
-      "nom": "Pont-Saint-Esprit",
-      "lat": 44.2555,
-      "lon": 4.6989,
-      "infoclimat_id": "A_REMPLIR"
-    },
-    {
-      "id": "uzes",
-      "nom": "Uzès",
-      "lat": 44.0122,
-      "lon": 4.4196,
-      "infoclimat_id": "A_REMPLIR"
-    },
-    {
-      "id": "villeneuve_lez_avignon",
-      "nom": "Villeneuve-lès-Avignon",
-      "lat": 43.9694,
-      "lon": 4.7947,
-      "infoclimat_id": "A_REMPLIR"
-    },
-    {
-      "id": "roquemaure",
-      "nom": "Roquemaure",
-      "lat": 44.0522,
-      "lon": 4.7756,
-      "infoclimat_id": "A_REMPLIR"
-    }
+    {"id": "st-montan", "nom": "Saint-Montan", "infoclimat_code": "MF07279001", "lat": 44.44, "lon": 4.64, "altitude": 130},
+    {"id": "orange-caritat", "nom": "Orange-Caritat", "infoclimat_code": "07579", "lat": 44.14, "lon": 4.86, "altitude": 57},
+    {"id": "pont-st-esprit", "nom": "Pont-Saint-Esprit", "infoclimat_code": "MF30202002", "lat": 44.2481, "lon": 4.6272, "altitude": 79},
+    {"id": "salindres", "nom": "Salindres", "infoclimat_code": "MF30305001", "lat": 44.1744, "lon": 4.1522, "altitude": 191},
+    {"id": "lussan-la-leque", "nom": "Lussan (la Lèque)", "infoclimat_code": "000ZW", "lat": null, "lon": null, "altitude": null},
+    {"id": "mejannes-le-clap", "nom": "Méjannes-le-Clap", "infoclimat_code": "MF30164001", "lat": 44.2161, "lon": 4.3308, "altitude": 313},
+    {"id": "malbosc", "nom": "Malbosc", "infoclimat_code": "000FK", "lat": null, "lon": null, "altitude": null},
+    {"id": "les-vans-sa", "nom": "Les Vans", "infoclimat_code": "MF07334004", "lat": null, "lon": null, "altitude": null},
+    {"id": "grospierres", "nom": "Grospierres", "infoclimat_code": "MF07101001", "lat": null, "lon": null, "altitude": null},
+    {"id": "bessas", "nom": "Bessas", "infoclimat_code": "MF07033001", "lat": null, "lon": null, "altitude": null},
+    {"id": "orgnac-aven", "nom": "Orgnac-l'Aven", "infoclimat_code": "MF07168001", "lat": null, "lon": null, "altitude": null},
+    {"id": "dent-de-rez", "nom": "Dent de Rez", "infoclimat_code": "000VQ", "lat": 44.42884, "lon": 4.5022, "altitude": 710},
+    {"id": "gras", "nom": "Gras", "infoclimat_code": "MF07099001", "lat": null, "lon": null, "altitude": null},
+    {"id": "bollene", "nom": "Bollène", "infoclimat_code": "STATIC0019", "lat": null, "lon": null, "altitude": null},
+    {"id": "lapalud", "nom": "Lapalud", "infoclimat_code": "MF84064001", "lat": null, "lon": null, "altitude": null},
+    {"id": "saint-paul-trois-chateaux", "nom": "Saint-Paul-Trois-Châteaux", "infoclimat_code": "000FU", "lat": null, "lon": null, "altitude": null},
+    {"id": "montjoyer", "nom": "Montjoyer", "infoclimat_code": "STATIC0098", "lat": null, "lon": null, "altitude": null},
+    {"id": "donzere", "nom": "Donzère", "infoclimat_code": "MF26116002", "lat": null, "lon": null, "altitude": null},
+    {"id": "deaux", "nom": "Deaux", "infoclimat_code": "MF30101001", "lat": null, "lon": null, "altitude": null},
+    {"id": "nimes-courbessac", "nom": "Nîmes-Courbessac", "infoclimat_code": "07645", "lat": null, "lon": null, "altitude": null},
+    {"id": "la-rouviere", "nom": "La Rouvière", "infoclimat_code": "MF30224001", "lat": null, "lon": null, "altitude": null},
+    {"id": "uzes", "nom": "Uzès", "infoclimat_code": "MF30334003", "lat": null, "lon": null, "altitude": null},
+    {"id": "avignon", "nom": "Avignon", "infoclimat_code": "07563", "lat": null, "lon": null, "altitude": null},
+    {"id": "pujaut", "nom": "Pujaut", "infoclimat_code": "MF30209002", "lat": null, "lon": null, "altitude": null},
+    {"id": "sorgues", "nom": "Sorgues", "infoclimat_code": "000YM", "lat": null, "lon": null, "altitude": null},
+    {"id": "saint-paul-les-fonts", "nom": "Saint-Paul-les-Fonts", "infoclimat_code": "000ZB", "lat": null, "lon": null, "altitude": null},
+    {"id": "saint-pons-la-calm-la-gardie", "nom": "Saint-Pons-la-Calm (La Gardie)", "infoclimat_code": "STATIC0451", "lat": null, "lon": null, "altitude": null},
+    {"id": "cavillargues", "nom": "Cavillargues", "infoclimat_code": "MF30076001", "lat": null, "lon": null, "altitude": null},
+    {"id": "saint-hilaire-de-brethmas", "nom": "Saint-Hilaire-de-Brethmas", "infoclimat_code": "000BZ", "lat": null, "lon": null, "altitude": null}
   ]
 }
