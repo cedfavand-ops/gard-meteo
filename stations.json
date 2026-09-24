@@ -10,22 +10,141 @@
   },
   "_note": "Liste limitee aux stations qui repondent reellement sur l'API opendata Infoclimat (les stations officielles Meteo-France comme Nimes-Courbessac, Avignon, Orange-Caritat, Pujaut, Saint-Montan, Salindres, Mejannes-le-Clap etc. affichees sur le site ne sont pas interrogeables via stations[] et ont ete retirees). lat/lon/altitude a null seront completes automatiquement par scripts/fetch_stations_metadata.py une fois la cle configuree.",
   "stations": [
-    {"id": "saint-paul-les-fonts", "nom": "Saint-Paul-les-Fonts", "infoclimat_code": "000ZB", "lat": null, "lon": null, "altitude": null},
-    {"id": "viviers", "nom": "Viviers", "infoclimat_code": "000U8", "lat": null, "lon": null, "altitude": null},
-    {"id": "montjoyer", "nom": "Montjoyer", "infoclimat_code": "STATIC0098", "lat": null, "lon": null, "altitude": null},
-    {"id": "saint-paul-trois-chateaux", "nom": "Saint-Paul-Trois-Châteaux", "infoclimat_code": "000FU", "lat": null, "lon": null, "altitude": null},
-    {"id": "bourg-saint-andeol", "nom": "Bourg-Saint-Andéol", "infoclimat_code": "000X1", "lat": null, "lon": null, "altitude": null},
-    {"id": "dent-de-rez", "nom": "Dent de Rez", "infoclimat_code": "000VQ", "lat": 44.42884, "lon": 4.5022, "altitude": 710},
-    {"id": "rochegude", "nom": "Rochegude", "infoclimat_code": "00035", "lat": 44.25, "lon": 4.8297, "altitude": 107},
-    {"id": "bollene", "nom": "Bollène", "infoclimat_code": "STATIC0019", "lat": null, "lon": null, "altitude": null},
-    {"id": "tulette", "nom": "Tulette", "infoclimat_code": "00034", "lat": 44.2833, "lon": 4.93333, "altitude": 120},
-    {"id": "orange-centre", "nom": "Orange Centre", "infoclimat_code": "00088", "lat": 44.1369, "lon": 4.81, "altitude": 44},
-    {"id": "sorgues", "nom": "Sorgues", "infoclimat_code": "000YM", "lat": null, "lon": null, "altitude": null},
-    {"id": "saint-saturnin-les-avignon-2", "nom": "Saint-Saturnin-lès-Avignon", "infoclimat_code": "000YO", "lat": null, "lon": null, "altitude": null},
-    {"id": "saint-saturnin-les-avignon", "nom": "Saint-Saturnin-lès-Avignon", "infoclimat_code": "000L3", "lat": 43.95501, "lon": 4.92548, "altitude": 60},
-    {"id": "montaren-et-saint-mediers", "nom": "Montaren-et-Saint-Médiers", "infoclimat_code": "000OW", "lat": null, "lon": null, "altitude": null},
-    {"id": "lussan-la-leque", "nom": "Lussan (la Lèque)", "infoclimat_code": "000ZW", "lat": null, "lon": null, "altitude": null},
-    {"id": "saint-hilaire-de-brethmas", "nom": "Saint-Hilaire-de-Brethmas", "infoclimat_code": "000BZ", "lat": null, "lon": null, "altitude": null},
-    {"id": "malbosc", "nom": "Malbosc", "infoclimat_code": "000FK", "lat": null, "lon": null, "altitude": null}
+    {
+      "id": "saint-paul-les-fonts",
+      "nom": "Saint-Paul-les-Fonts",
+      "infoclimat_code": "000ZB",
+      "lat": 44.084,
+      "lon": 4.615,
+      "altitude": 80
+    },
+    {
+      "id": "viviers",
+      "nom": "Viviers",
+      "infoclimat_code": "000U8",
+      "lat": 44.485,
+      "lon": 4.687,
+      "altitude": 90
+    },
+    {
+      "id": "montjoyer",
+      "nom": "Montjoyer",
+      "infoclimat_code": "STATIC0098",
+      "lat": 44.476,
+      "lon": 4.851,
+      "altitude": 310
+    },
+    {
+      "id": "saint-paul-trois-chateaux",
+      "nom": "Saint-Paul-Trois-Châteaux",
+      "infoclimat_code": "000FU",
+      "lat": 44.349,
+      "lon": 4.766,
+      "altitude": 107
+    },
+    {
+      "id": "bourg-saint-andeol",
+      "nom": "Bourg-Saint-Andéol",
+      "infoclimat_code": "000X1",
+      "lat": 44.376,
+      "lon": 4.643,
+      "altitude": 140
+    },
+    {
+      "id": "dent-de-rez",
+      "nom": "Dent de Rez",
+      "infoclimat_code": "000VQ",
+      "lat": 44.429,
+      "lon": 4.502,
+      "altitude": 710
+    },
+    {
+      "id": "rochegude",
+      "nom": "Rochegude",
+      "infoclimat_code": "00035",
+      "lat": 44.25,
+      "lon": 4.83,
+      "altitude": 107
+    },
+    {
+      "id": "bollene",
+      "nom": "Bollène",
+      "infoclimat_code": "STATIC0019",
+      "lat": 44.289,
+      "lon": 4.786,
+      "altitude": 58
+    },
+    {
+      "id": "tulette",
+      "nom": "Tulette",
+      "infoclimat_code": "00034",
+      "lat": 44.283,
+      "lon": 4.933,
+      "altitude": 120
+    },
+    {
+      "id": "orange-centre",
+      "nom": "Orange Centre",
+      "infoclimat_code": "00088",
+      "lat": 44.137,
+      "lon": 4.81,
+      "altitude": 44
+    },
+    {
+      "id": "sorgues",
+      "nom": "Sorgues",
+      "infoclimat_code": "000YM",
+      "lat": 44.01,
+      "lon": 4.874,
+      "altitude": 30
+    },
+    {
+      "id": "saint-saturnin-les-avignon-2",
+      "nom": "Saint-Saturnin-lès-Avignon",
+      "infoclimat_code": "000YO",
+      "lat": 43.955,
+      "lon": 4.925,
+      "altitude": 66
+    },
+    {
+      "id": "saint-saturnin-les-avignon",
+      "nom": "Saint-Saturnin-lès-Avignon",
+      "infoclimat_code": "000L3",
+      "lat": 43.955,
+      "lon": 4.925,
+      "altitude": 60
+    },
+    {
+      "id": "montaren-et-saint-mediers",
+      "nom": "Montaren-et-Saint-Médiers",
+      "infoclimat_code": "000OW",
+      "lat": 44.029,
+      "lon": 4.38,
+      "altitude": 112
+    },
+    {
+      "id": "lussan-la-leque",
+      "nom": "Lussan (la Lèque)",
+      "infoclimat_code": "000ZW",
+      "lat": 44.189,
+      "lon": 4.36,
+      "altitude": 255
+    },
+    {
+      "id": "saint-hilaire-de-brethmas",
+      "nom": "Saint-Hilaire-de-Brethmas",
+      "infoclimat_code": "000BZ",
+      "lat": 44.08,
+      "lon": 4.125,
+      "altitude": 130
+    },
+    {
+      "id": "malbosc",
+      "nom": "Malbosc",
+      "infoclimat_code": "000FK",
+      "lat": 44.347,
+      "lon": 4.074,
+      "altitude": 480
+    }
   ]
 }
