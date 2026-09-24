@@ -29,16 +29,7 @@ if not API_KEY:
 
 
 def fetch_metadata(codes):
-    """
-    Un seul appel avec tous les codes de station a la fois.
-
-    NB : la structure exacte de la reponse (imbrication des cles) n'a pas pu
-    etre verifiee sans compte actif au moment de l'ecriture de ce script --
-    ce parsing essaie plusieurs formes plausibles. Si ca ne matche pas,
-    lance ce script avec DEBUG=1 pour voir le JSON brut et ajuste
-    extract_one() en consequence (2 minutes de travail, la structure est
-    generalement auto-explicative).
-    """
+    """Un seul appel avec tous les codes de station a la fois."""
     params = [
         ("version", "2"),
         ("method", "get"),
@@ -60,33 +51,20 @@ def fetch_metadata(codes):
 
 
 def extract_one(data, code):
-    """Essaie plusieurs formes plausibles de reponse pour un code donne."""
-    stations_blob = data.get("stations", data)
-
-    entry = None
-    if isinstance(stations_blob, dict):
-        entry = stations_blob.get(code)
-    elif isinstance(stations_blob, list):
-        entry = next((s for s in stations_blob if s.get("id") == code), None)
-
-    if not entry:
-        return None
-
-    meta = entry.get("metadonnees", entry)
-    lat = meta.get("latitude") or meta.get("lat")
-    lon = meta.get("longitude") or meta.get("lon")
-    alt = meta.get("altitude")
-    nom = meta.get("nom") or meta.get("name")
-
-    if lat is None or lon is None:
-        return None
-
-    return {
-        "lat": round(float(lat), 5),
-        "lon": round(float(lon), 5),
-        "altitude": int(alt) if alt is not None else None,
-        "nom_api": nom,
-    }
+    """Structure reelle confirmee : data['stations'] est une LISTE de dicts
+    {id, name, latitude, longitude, elevation, ...}."""
+    for entry in data.get("stations", []):
+        if entry.get("id") == code:
+            lat, lon, alt = entry.get("latitude"), entry.get("longitude"), entry.get("elevation")
+            if lat is None or lon is None:
+                return None
+            return {
+                "lat": round(float(lat), 5),
+                "lon": round(float(lon), 5),
+                "altitude": int(alt) if alt is not None else None,
+                "nom_api": entry.get("name"),
+            }
+    return None
 
 
 def main():

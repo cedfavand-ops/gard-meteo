@@ -20,9 +20,10 @@ import csv
 import json
 import os
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -109,17 +110,15 @@ def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
 def fetch_infoclimat_obs_batch(codes, day):
     """
     Un seul appel Infoclimat (version=2) pour recuperer les observations
-    d'une journee pour TOUTES les stations a la fois -- confirme par
-    l'utilisateur : stations[] peut etre repete pour chaque code.
+    d'une journee LOCALE (Europe/Paris) pour TOUTES les stations a la fois.
+
+    dh_utc dans la reponse est en UTC ; une journee "Paris" ne correspond
+    pas exactement a une journee UTC (decalage de 1h ou 2h selon la saison).
+    On demande donc une fenetre UTC un peu plus large (la veille + le jour
+    meme) et on filtre precisement par date locale Paris ensuite.
 
     Retourne { code: {"tn": ..., "tx": ...} } pour les stations ou une
-    temperature a ete trouvee.
-
-    NB : la structure exacte du JSON n'a pas pu etre verifiee sans compte
-    actif au moment de l'ecriture. Si le parsing echoue, lance ce script
-    avec la variable DEBUG=1 pour afficher la reponse brute et ajuster
-    extract_tn_tx() ci-dessous (rapide, la structure est generalement
-    auto-explicative une fois qu'on la voit).
+    temperature a ete trouvee ce jour-la.
     """
     if not INFOCLIMAT_API_KEY or not codes:
         return {}
@@ -128,7 +127,7 @@ def fetch_infoclimat_obs_batch(codes, day):
         ("version", "2"),
         ("method", "get"),
         ("format", "json"),
-        ("start", day.isoformat()),
+        ("start", (day - timedelta(days=1)).isoformat()),
         ("end", day.isoformat()),
         ("token", INFOCLIMAT_API_KEY),
     ]
@@ -145,34 +144,40 @@ def fetch_infoclimat_obs_batch(codes, day):
         print(f"  [!] Echec recuperation Infoclimat: {e}", file=sys.stderr)
         return {}
 
-    if os.environ.get("DEBUG"):
-        print(json.dumps(payload, ensure_ascii=False, indent=2)[:3000])
+    if payload.get("status") != "OK":
+        print(f"  [!] Infoclimat a renvoye une erreur: {payload.get('errors')}", file=sys.stderr)
 
-    return extract_tn_tx_per_station(payload, codes)
+    return extract_tn_tx_per_station(payload, codes, day)
 
 
-def extract_tn_tx_per_station(payload, codes):
-    """Essaie plusieurs formes plausibles de reponse (voir note ci-dessus)."""
+def extract_tn_tx_per_station(payload, codes, target_day):
+    """
+    Structure reelle confirmee : payload['hourly'][code] est une LISTE de
+    releves { "dh_utc": "YYYY-MM-DD HH:MM:SS", "temperature": "23.1" (str), ... }
+    (pas d'agregation daily fournie -> on calcule nous-memes min/max, et on
+    ne garde que les releves dont la date LOCALE Paris == target_day).
+    """
+    paris_tz = ZoneInfo("Europe/Paris")
+    hourly = payload.get("hourly", {})
     result = {}
-    stations_blob = payload.get("stations", payload)
 
     for code in codes:
-        entry = stations_blob.get(code) if isinstance(stations_blob, dict) else None
-        if not entry:
-            continue
-        # Forme probable : { code: { "2026-09-23 00:00:00": {"temperature": ...}, ... } }
-        # ou { code: {"hourly": {...}} } -- on essaie les deux.
-        hourly = entry.get("hourly", entry)
+        records = hourly.get(code) or []
         temps = []
-        if isinstance(hourly, dict):
-            for v in hourly.values():
-                if isinstance(v, dict) and v.get("temperature") is not None:
-                    try:
-                        temps.append(float(v["temperature"]))
-                    except (TypeError, ValueError):
-                        pass
+        for rec in records:
+            raw_temp = rec.get("temperature")
+            raw_dh = rec.get("dh_utc")
+            if raw_temp is None or raw_dh is None:
+                continue
+            try:
+                dh_utc = datetime.strptime(raw_dh, "%Y-%m-%d %H:%M:%S").replace(tzinfo=ZoneInfo("UTC"))
+                if dh_utc.astimezone(paris_tz).date() != target_day:
+                    continue
+                temps.append(float(raw_temp))
+            except (ValueError, TypeError):
+                continue
         if temps:
-            result[code] = {"tn": min(temps), "tx": max(temps)}
+            result[code] = {"tn": round(min(temps), 1), "tx": round(max(temps), 1)}
 
     return result
 

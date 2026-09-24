@@ -3,8 +3,15 @@
 Carte de prévision (Tn/Tx du lendemain) pour le Gard rhodanien et ses marges
 (Ardèche, Vaucluse, Drôme), basée sur **ICON‑CH1** (MétéoSuisse, run 12z fixe,
 via l'API [Open‑Meteo](https://open-meteo.com)), et **corrigée peu à peu**
-grâce aux observations réelles archivées depuis 29 stations
-[Infoclimat](https://www.infoclimat.fr/opendata) de la région.
+grâce aux observations réelles archivées depuis 17 stations
+[Infoclimat](https://www.infoclimat.fr/opendata) (réseau StatIC) de la région.
+
+> **Note importante** : les stations officielles Météo-France affichées sur
+> le site infoclimat.fr (Nîmes-Courbessac, Avignon, Orange-Caritat, Pujaut,
+> Saint-Montan, Salindres, Méjannes-le-Clap, etc.) ne sont **pas**
+> interrogeables via l'API `stations[]` — testé et confirmé. Seules les
+> stations du réseau amateur StatIC (codes `000XXX` / `STATICxxxx` /
+> `000XX`) répondent. `stations.json` ne liste donc que celles-là.
 
 ## Comment ça marche
 
@@ -52,7 +59,7 @@ important pour que la correction de biais ait un sens.
 export INFOCLIMAT_API_KEY="ta_cle"
 python scripts/fetch_stations_metadata.py
 ```
-Ce script fait **un seul appel** avec les 29 codes de station à la fois et
+Ce script fait **un seul appel** avec les 17 codes de station à la fois et
 remplit les `lat`/`lon`/`altitude` manquants dans `stations.json`. Vérifie le
 résultat (`git diff stations.json`) avant de committer — si certaines
 stations restent sans coordonnées, relance avec `DEBUG=1` pour voir la
