@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-24",
+  "generated_at": "2026-09-26",
   "zone": {
     "nom": "Gard rhodanien",
     "bbox": {
@@ -9,101 +9,5 @@
       "lon_max": 4.913134
     }
   },
-  "stations": [
-    {
-      "id": "dent-de-rez",
-      "nom": "Dent de Rez",
-      "lat": 44.42884,
-      "lon": 4.5022,
-      "date_prevue": "2026-09-25",
-      "brute": {
-        "tn": 16.1,
-        "tx": 26.2
-      },
-      "corrigee": {
-        "tn": 16.1,
-        "tx": 26.2
-      },
-      "biais_applique": {
-        "tn": 0.0,
-        "tx": 0.0
-      }
-    },
-    {
-      "id": "rochegude",
-      "nom": "Rochegude",
-      "lat": 44.25,
-      "lon": 4.8297,
-      "date_prevue": "2026-09-25",
-      "brute": {
-        "tn": 17.3,
-        "tx": 30.7
-      },
-      "corrigee": {
-        "tn": 17.3,
-        "tx": 30.7
-      },
-      "biais_applique": {
-        "tn": 0.0,
-        "tx": 0.0
-      }
-    },
-    {
-      "id": "tulette",
-      "nom": "Tulette",
-      "lat": 44.2833,
-      "lon": 4.93333,
-      "date_prevue": "2026-09-25",
-      "brute": {
-        "tn": 16.5,
-        "tx": 30.5
-      },
-      "corrigee": {
-        "tn": 16.5,
-        "tx": 30.5
-      },
-      "biais_applique": {
-        "tn": 0.0,
-        "tx": 0.0
-      }
-    },
-    {
-      "id": "orange-centre",
-      "nom": "Orange Centre",
-      "lat": 44.1369,
-      "lon": 4.81,
-      "date_prevue": "2026-09-25",
-      "brute": {
-        "tn": 17.1,
-        "tx": 31.6
-      },
-      "corrigee": {
-        "tn": 17.1,
-        "tx": 31.6
-      },
-      "biais_applique": {
-        "tn": 0.0,
-        "tx": 0.0
-      }
-    },
-    {
-      "id": "saint-saturnin-les-avignon",
-      "nom": "Saint-Saturnin-lès-Avignon",
-      "lat": 43.95501,
-      "lon": 4.92548,
-      "date_prevue": "2026-09-25",
-      "brute": {
-        "tn": 17.0,
-        "tx": 31.0
-      },
-      "corrigee": {
-        "tn": 17.0,
-        "tx": 31.0
-      },
-      "biais_applique": {
-        "tn": 0.0,
-        "tx": 0.0
-      }
-    }
-  ]
+  "stations": []
 }
