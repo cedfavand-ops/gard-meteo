@@ -141,6 +141,7 @@ const ChampTemperature = L.Layer.extend({
     this._canvas = L.DomUtil.create('canvas', 'champ-temperature-canvas');
     this._canvas.style.position = 'absolute';
     this._canvas.style.pointerEvents = 'none';
+    this._canvas.style.opacity = '0.62';
     map.getPanes().overlayPane.appendChild(this._canvas);
     map.on('move zoom resize', this._redraw, this);
     this._redraw();
