@@ -33,16 +33,7 @@ HISTORY_FILE = ROOT / "data" / "history.csv"
 BIAS_FILE = ROOT / "data" / "bias.json"
 LATEST_FILE = ROOT / "data" / "latest.json"
 
-# Poids donné à la nouvelle erreur dans la moyenne mobile exponentielle.
-# 0.2-0.3 = correction progressive et stable ; plus haut = réagit plus vite
-# mais plus bruité.
 ALPHA = 0.25
-
-# Heure (UTC) du run ICON-CH1 à utiliser systématiquement. ICON-CH1 tourne
-# toutes les 3h (00,03,06,09,12,15,18,21). Fixer un run précis (plutôt que de
-# laisser l'API renvoyer "le dernier run disponible", qui change selon
-# l'heure d'exécution du script) garantit une prévision comparable jour
-# après jour -- important pour que la correction de biais ait un sens.
 RUN_HOUR_UTC = 12  # ou 15, selon ta préférence
 
 INFOCLIMAT_API_KEY = os.environ.get("INFOCLIMAT_API_KEY")
@@ -62,20 +53,8 @@ def save_json(path, data):
 
 
 def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
-    """
-    Prevision Tn/Tx de demain (ICON-CH1, MeteoSuisse), pour un run precis
-    (ex: le 12z du jour), via la Single Runs API d'Open-Meteo.
-
-    On demande la temperature horaire (pas l'agregat "daily" tout fait, qui
-    n'est pas garanti sur cet endpoint) et on calcule nous-memes le Tn/Tx du
-    jour cible a partir des valeurs horaires -- plus robuste.
-
-    NB : cette API est recente ; verifie le format exact sur
-    https://open-meteo.com/en/docs si jamais la reponse ne correspond plus
-    a ce qui est suppose ici (parametres run= et models=).
-    """
     run_iso = f"{run_date.isoformat()}T{run_hour:02d}:00"
-    target_day = run_date + timedelta(days=1)  # le run de J sert a prevoir J+1
+    target_day = run_date + timedelta(days=1)
 
     url = "https://single-runs-api.open-meteo.com/v1/forecast"
     params = {
@@ -87,6 +66,8 @@ def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
         "timezone": "Europe/Paris",
     }
     r = requests.get(url, params=params, timeout=30)
+    if not r.ok:
+        print(f"  [!] Open-Meteo a renvoye une erreur {r.status_code} : {r.text[:500]}", file=sys.stderr)
     r.raise_for_status()
     hourly = r.json()["hourly"]
 
@@ -108,18 +89,6 @@ def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
 
 
 def fetch_infoclimat_obs_batch(codes, day):
-    """
-    Un seul appel Infoclimat (version=2) pour recuperer les observations
-    d'une journee LOCALE (Europe/Paris) pour TOUTES les stations a la fois.
-
-    dh_utc dans la reponse est en UTC ; une journee "Paris" ne correspond
-    pas exactement a une journee UTC (decalage de 1h ou 2h selon la saison).
-    On demande donc une fenetre UTC un peu plus large (la veille + le jour
-    meme) et on filtre precisement par date locale Paris ensuite.
-
-    Retourne { code: {"tn": ..., "tx": ...} } pour les stations ou une
-    temperature a ete trouvee ce jour-la.
-    """
     if not INFOCLIMAT_API_KEY or not codes:
         return {}
 
@@ -138,6 +107,8 @@ def fetch_infoclimat_obs_batch(codes, day):
 
     try:
         r = requests.get(url, timeout=30)
+        if not r.ok:
+            print(f"  [!] Infoclimat a renvoye une erreur {r.status_code} : {r.text[:500]}", file=sys.stderr)
         r.raise_for_status()
         payload = r.json()
     except Exception as e:
@@ -151,12 +122,6 @@ def fetch_infoclimat_obs_batch(codes, day):
 
 
 def extract_tn_tx_per_station(payload, codes, target_day):
-    """
-    Structure reelle confirmee : payload['hourly'][code] est une LISTE de
-    releves { "dh_utc": "YYYY-MM-DD HH:MM:SS", "temperature": "23.1" (str), ... }
-    (pas d'agregation daily fournie -> on calcule nous-memes min/max, et on
-    ne garde que les releves dont la date LOCALE Paris == target_day).
-    """
     paris_tz = ZoneInfo("Europe/Paris")
     hourly = payload.get("hourly", {})
     result = {}
@@ -183,7 +148,6 @@ def extract_tn_tx_per_station(payload, codes, target_day):
 
 
 def update_bias(bias_store, station_id, obs, fcst_for_that_day):
-    """Met a jour le biais (obs - prevision) par moyenne mobile exponentielle."""
     if obs is None or fcst_for_that_day is None:
         return
     entry = bias_store.setdefault(station_id, {"bias_tn": 0.0, "bias_tx": 0.0})
@@ -218,8 +182,6 @@ def main():
 
     today = date.today()
 
-    # Stations pas encore geolocalisees (lat/lon manquants) : on les saute,
-    # avec un avertissement, plutot que de planter tout le pipeline.
     stations_ok = [s for s in config["stations"] if s.get("lat") is not None and s.get("lon") is not None]
     stations_incomplete = [s["id"] for s in config["stations"] if s not in stations_ok]
     if stations_incomplete:
@@ -229,7 +191,6 @@ def main():
             file=sys.stderr,
         )
 
-    # Un seul appel Infoclimat pour toutes les stations d'un coup.
     codes = [s["infoclimat_code"] for s in stations_ok]
     obs_today_par_code = fetch_infoclimat_obs_batch(codes, today)
 
@@ -241,11 +202,12 @@ def main():
         code = st["infoclimat_code"]
         print(f"-> {st['nom']}")
 
-        # 1) prevision brute de demain, depuis le run RUN_HOUR_UTC d'aujourd'hui
-        fcst_tomorrow = fetch_icon_ch1_forecast(st["lat"], st["lon"], today)
+        try:
+            fcst_tomorrow = fetch_icon_ch1_forecast(st["lat"], st["lon"], today)
+        except Exception as e:
+            print(f"  [!] Prevision impossible pour {st['nom']}: {e}", file=sys.stderr)
+            continue
 
-        # 2) prevision qui avait ete faite hier pour aujourd'hui (relue dans
-        #    l'historique local) + observation reelle d'aujourd'hui -> biais
         prev_fcst_for_today = None
         if HISTORY_FILE.exists():
             with open(HISTORY_FILE, encoding="utf-8") as f:
