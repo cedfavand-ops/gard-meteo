@@ -162,8 +162,8 @@ const ChampTemperature = L.Layer.extend({
       const spt = map.latLngToContainerPoint([s.lat, s.lon]);
       const dx = pt.x - spt.x, dy = pt.y - spt.y;
       let d2 = dx * dx + dy * dy;
-      if (d2 < 4) d2 = 4;
-      const poids = 1 / (d2 * d2);
+      if (d2 < 400) d2 = 400;
+      const poids = 1 / d2;
       num += poids * s.corrigee[this._field];
       den += poids;
     }
@@ -206,8 +206,8 @@ const ChampTemperature = L.Layer.extend({
         for (const s of stationsPix) {
           const dx = px - s.pt.x, dy = py - s.pt.y;
           let d2 = dx * dx + dy * dy;
-          if (d2 < 4) d2 = 4;
-          const poids = 1 / (d2 * d2);
+          if (d2 < 400) d2 = 400;
+          const poids = 1 / d2;
           num += poids * s.val; den += poids;
         }
         grille[idx] = num / den;
