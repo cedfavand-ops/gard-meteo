@@ -9,5 +9,329 @@
       "lon_max": 4.913134
     }
   },
-  "stations": []
+  "stations": [
+    {
+      "id": "saint-paul-les-fonts",
+      "nom": "Saint-Paul-les-Fonts",
+      "lat": 44.084,
+      "lon": 4.615,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.9,
+        "tx": 29.7
+      },
+      "corrigee": {
+        "tn": 16.9,
+        "tx": 29.7
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "viviers",
+      "nom": "Viviers",
+      "lat": 44.485,
+      "lon": 4.687,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 15.7,
+        "tx": 29.1
+      },
+      "corrigee": {
+        "tn": 15.7,
+        "tx": 29.1
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "montjoyer",
+      "nom": "Montjoyer",
+      "lat": 44.476,
+      "lon": 4.851,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.1,
+        "tx": 27.1
+      },
+      "corrigee": {
+        "tn": 16.1,
+        "tx": 27.1
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "saint-paul-trois-chateaux",
+      "nom": "Saint-Paul-Trois-Châteaux",
+      "lat": 44.349,
+      "lon": 4.766,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.9,
+        "tx": 29.4
+      },
+      "corrigee": {
+        "tn": 16.9,
+        "tx": 29.4
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "bourg-saint-andeol",
+      "nom": "Bourg-Saint-Andéol",
+      "lat": 44.376,
+      "lon": 4.643,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.6,
+        "tx": 28.6
+      },
+      "corrigee": {
+        "tn": 16.6,
+        "tx": 28.6
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "dent-de-rez",
+      "nom": "Dent de Rez",
+      "lat": 44.429,
+      "lon": 4.502,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 14.5,
+        "tx": 24.3
+      },
+      "corrigee": {
+        "tn": 14.5,
+        "tx": 24.3
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "rochegude",
+      "nom": "Rochegude",
+      "lat": 44.25,
+      "lon": 4.83,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.6,
+        "tx": 29.3
+      },
+      "corrigee": {
+        "tn": 16.6,
+        "tx": 29.3
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "bollene",
+      "nom": "Bollène",
+      "lat": 44.289,
+      "lon": 4.786,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 15.6,
+        "tx": 29.8
+      },
+      "corrigee": {
+        "tn": 15.6,
+        "tx": 29.8
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "tulette",
+      "nom": "Tulette",
+      "lat": 44.283,
+      "lon": 4.933,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.2,
+        "tx": 29.0
+      },
+      "corrigee": {
+        "tn": 16.2,
+        "tx": 29.0
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "orange-centre",
+      "nom": "Orange Centre",
+      "lat": 44.137,
+      "lon": 4.81,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 15.9,
+        "tx": 29.7
+      },
+      "corrigee": {
+        "tn": 15.9,
+        "tx": 29.7
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "sorgues",
+      "nom": "Sorgues",
+      "lat": 44.01,
+      "lon": 4.874,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.5,
+        "tx": 30.1
+      },
+      "corrigee": {
+        "tn": 16.5,
+        "tx": 30.1
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "saint-saturnin-les-avignon-2",
+      "nom": "Saint-Saturnin-lès-Avignon",
+      "lat": 43.955,
+      "lon": 4.925,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.2,
+        "tx": 29.9
+      },
+      "corrigee": {
+        "tn": 16.2,
+        "tx": 29.9
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "saint-saturnin-les-avignon",
+      "nom": "Saint-Saturnin-lès-Avignon",
+      "lat": 43.955,
+      "lon": 4.925,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.2,
+        "tx": 29.9
+      },
+      "corrigee": {
+        "tn": 16.2,
+        "tx": 29.9
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "montaren-et-saint-mediers",
+      "nom": "Montaren-et-Saint-Médiers",
+      "lat": 44.029,
+      "lon": 4.38,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 15.6,
+        "tx": 29.0
+      },
+      "corrigee": {
+        "tn": 15.6,
+        "tx": 29.0
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "lussan-la-leque",
+      "nom": "Lussan (la Lèque)",
+      "lat": 44.189,
+      "lon": 4.36,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 16.6,
+        "tx": 27.4
+      },
+      "corrigee": {
+        "tn": 16.6,
+        "tx": 27.4
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "saint-hilaire-de-brethmas",
+      "nom": "Saint-Hilaire-de-Brethmas",
+      "lat": 44.08,
+      "lon": 4.125,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 15.7,
+        "tx": 27.9
+      },
+      "corrigee": {
+        "tn": 15.7,
+        "tx": 27.9
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    },
+    {
+      "id": "malbosc",
+      "nom": "Malbosc",
+      "lat": 44.347,
+      "lon": 4.074,
+      "date_prevue": "2026-09-27",
+      "brute": {
+        "tn": 12.4,
+        "tx": 25.1
+      },
+      "corrigee": {
+        "tn": 12.4,
+        "tx": 25.1
+      },
+      "biais_applique": {
+        "tn": 0.0,
+        "tx": 0.0
+      }
+    }
+  ]
 }
