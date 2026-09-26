@@ -12,7 +12,6 @@
     --calcaire: #efe9db;
     --garrigue: #3a4a34;
     --tuile: #a6543f;
-    --ocre: #c98f2c;
     --encre: #23281f;
   }
   * { box-sizing: border-box; }
@@ -39,93 +38,39 @@
     margin: 0 0 0.2rem;
     color: var(--garrigue);
   }
-  .sous-titre {
-    margin: 0;
-    font-size: 0.9rem;
-    color: rgba(35,40,31,0.7);
-  }
-  .toggle-champ {
-    display: flex;
-    border: 1.5px solid var(--garrigue);
-    border-radius: 8px;
-    overflow: hidden;
-  }
+  .sous-titre { margin: 0; font-size: 0.9rem; color: rgba(35,40,31,0.7); }
+  .toggle-champ { display: flex; border: 1.5px solid var(--garrigue); border-radius: 8px; overflow: hidden; }
   .toggle-champ button {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background: white;
-    color: var(--garrigue);
-    border: none;
-    padding: 0.4rem 0.9rem;
-    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; font-weight: 600;
+    background: white; color: var(--garrigue); border: none; padding: 0.4rem 0.9rem; cursor: pointer;
   }
-  .toggle-champ button.actif {
-    background: var(--garrigue);
-    color: white;
-  }
-  #carte {
-    height: calc(100vh - 92px);
-    width: 100%;
-    position: relative;
-  }
-  .popup-station h3 {
-    font-family: 'Fraunces', serif;
-    margin: 0 0 0.4rem;
-    font-size: 1.05rem;
-  }
-  .popup-temps {
-    display: flex;
-    gap: 1.2rem;
-    margin: 0.3rem 0;
-  }
-  .popup-temps .val {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 1.3rem;
-    font-weight: 600;
-  }
-  .popup-temps .label {
-    font-size: 0.72rem;
-    color: rgba(35,40,31,0.6);
-  }
+  .toggle-champ button.actif { background: var(--garrigue); color: white; }
+  #carte { height: calc(100vh - 92px); width: 100%; position: relative; }
+  .popup-station h3 { font-family: 'Fraunces', serif; margin: 0 0 0.4rem; font-size: 1.05rem; }
+  .popup-temps { display: flex; gap: 1.2rem; margin: 0.3rem 0; }
+  .popup-temps .val { font-family: 'IBM Plex Mono', monospace; font-size: 1.3rem; font-weight: 600; }
+  .popup-temps .label { font-size: 0.72rem; color: rgba(35,40,31,0.6); }
   .tx .val { color: var(--tuile); }
   .tn .val { color: var(--garrigue); }
-  .popup-biais {
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
-    color: rgba(35,40,31,0.65);
-  }
+  .popup-biais { margin-top: 0.5rem; font-size: 0.75rem; color: rgba(35,40,31,0.65); }
   .marker-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    font-weight: 600;
-    background: white;
-    border-radius: 4px;
-    padding: 1px 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600;
+    background: white; border-radius: 4px; padding: 1px 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
     white-space: nowrap;
   }
   .legende {
-    position: absolute;
-    left: 12px;
-    bottom: 24px;
-    z-index: 1000;
-    background: rgba(255,255,255,0.92);
-    border-radius: 8px;
-    padding: 0.6rem 0.8rem;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.25);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    min-width: 160px;
+    position: absolute; left: 12px; bottom: 24px; z-index: 1000;
+    background: rgba(255,255,255,0.92); border-radius: 8px; padding: 0.6rem 0.8rem;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.25); font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem; min-width: 160px;
   }
-  .legende .barre {
-    height: 10px;
-    border-radius: 5px;
-    margin: 0.35rem 0;
-  }
-  .legende .bornes {
-    display: flex;
-    justify-content: space-between;
+  .legende .barre { height: 10px; border-radius: 5px; margin: 0.35rem 0; }
+  .legende .bornes { display: flex; justify-content: space-between; }
+  .curseur-info {
+    position: absolute; z-index: 1001; pointer-events: none;
+    background: var(--encre); color: white; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem; font-weight: 600; padding: 3px 8px; border-radius: 5px;
+    transform: translate(12px, -50%); display: none; white-space: nowrap;
   }
 </style>
 </head>
@@ -148,18 +93,20 @@
     <div class="barre" id="legende-barre"></div>
     <div class="bornes"><span id="legende-min"></span><span id="legende-max"></span></div>
   </div>
+  <div class="curseur-info" id="curseur-info"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
-// Degrade utilise pour le champ de couleur ET la legende (bleu -> rouge).
+// Palette arc-en-ciel (violet -> bleu -> vert -> jaune -> orange -> rouge)
 const STOPS = [
-  [0.00, [37, 99, 235]],
-  [0.25, [56, 189, 189]],
-  [0.50, [130, 170, 60]],
-  [0.70, [201, 143, 44]],
-  [0.85, [166, 84, 63]],
-  [1.00, [178, 34, 34]],
+  [0.00, [120, 0, 190]],
+  [0.15, [40, 60, 230]],
+  [0.32, [20, 170, 210]],
+  [0.50, [40, 190, 70]],
+  [0.66, [225, 215, 30]],
+  [0.82, [235, 130, 20]],
+  [1.00, [210, 25, 25]],
 ];
 function couleurPour(t, min, max) {
   const x = Math.max(0, Math.min(1, (t - min) / ((max - min) || 1)));
@@ -176,20 +123,24 @@ function couleurPour(t, min, max) {
   }
   return STOPS[STOPS.length - 1][1];
 }
+function palier(v, pas) { return Math.floor(v / pas + 1e-9) * pas; }
 
-// Couche Leaflet perso : dessine un champ de temperature interpole (IDW)
-// entre les stations, en toile de fond de la carte.
+const PAS_COULEUR = 0.5;
+const PAS_ISOLIGNE = 1;
+const PAS_ISOLIGNE_EPAIS = 5;
+const RES = 5; // taille de cellule de la grille de calcul, en pixels ecran
+
 const ChampTemperature = L.Layer.extend({
-  initialize(stations, field) {
+  initialize(stations, field, zone) {
     this._stations = stations;
     this._field = field;
+    this._zone = zone;
   },
   onAdd(map) {
     this._map = map;
     this._canvas = L.DomUtil.create('canvas', 'champ-temperature-canvas');
     this._canvas.style.position = 'absolute';
     this._canvas.style.pointerEvents = 'none';
-    this._canvas.style.opacity = '0.55';
     map.getPanes().overlayPane.appendChild(this._canvas);
     map.on('move zoom resize', this._redraw, this);
     this._redraw();
@@ -202,6 +153,25 @@ const ChampTemperature = L.Layer.extend({
     this._field = field;
     this._redraw();
   },
+  valeurEn(lat, lon) {
+    const map = this._map;
+    const pt = map.latLngToContainerPoint([lat, lon]);
+    let num = 0, den = 0;
+    for (const s of this._stations) {
+      const spt = map.latLngToContainerPoint([s.lat, s.lon]);
+      const dx = pt.x - spt.x, dy = pt.y - spt.y;
+      let d2 = dx * dx + dy * dy;
+      if (d2 < 4) d2 = 4;
+      const poids = 1 / (d2 * d2);
+      num += poids * s.corrigee[this._field];
+      den += poids;
+    }
+    return num / den;
+  },
+  dansLaZone(lat, lon) {
+    return lat <= this._zone.lat_max && lat >= this._zone.lat_min &&
+           lon >= this._zone.lon_min && lon <= this._zone.lon_max;
+  },
   _redraw() {
     if (!this._map) return;
     const map = this._map;
@@ -209,49 +179,82 @@ const ChampTemperature = L.Layer.extend({
     const canvas = this._canvas;
     canvas.width = size.x;
     canvas.height = size.y;
-    const topLeft = map.containerPointToLayerPoint([0, 0]);
-    L.DomUtil.setPosition(canvas, topLeft);
+    L.DomUtil.setPosition(canvas, map.containerPointToLayerPoint([0, 0]));
 
     const valeurs = this._stations.map(s => s.corrigee[this._field]);
-    const min = Math.min(...valeurs) - 1;
-    const max = Math.max(...valeurs) + 1;
+    const min = Math.min(...valeurs), max = Math.max(...valeurs);
     document.dispatchEvent(new CustomEvent('champ-echelle', {detail: {min, max, field: this._field}}));
 
-    const pts = this._stations.map(s => ({
+    const stationsPix = this._stations.map(s => ({
       pt: map.latLngToContainerPoint([s.lat, s.lon]),
       val: s.corrigee[this._field],
     }));
 
-    const RES = 6; // calcule 1 pixel sur RES, puis lisse a l'affichage
-    const w = Math.ceil(size.x / RES), h = Math.ceil(size.y / RES);
-    const off = document.createElement('canvas');
-    off.width = w; off.height = h;
-    const octx = off.getContext('2d');
-    const img = octx.createImageData(w, h);
+    const w = Math.ceil(size.x / RES) + 1, h = Math.ceil(size.y / RES) + 1;
+    const grille = new Float32Array(w * h);
+    const dansZone = new Uint8Array(w * h);
 
     for (let j = 0; j < h; j++) {
       for (let i = 0; i < w; i++) {
         const px = i * RES, py = j * RES;
+        const latlng = map.containerPointToLatLng([px, py]);
+        const idx = j * w + i;
+        if (!this.dansLaZone(latlng.lat, latlng.lng)) { dansZone[idx] = 0; continue; }
+        dansZone[idx] = 1;
         let num = 0, den = 0;
-        for (const p of pts) {
-          const dx = px - p.pt.x, dy = py - p.pt.y;
+        for (const s of stationsPix) {
+          const dx = px - s.pt.x, dy = py - s.pt.y;
           let d2 = dx * dx + dy * dy;
           if (d2 < 4) d2 = 4;
           const poids = 1 / (d2 * d2);
-          num += poids * p.val;
-          den += poids;
+          num += poids * s.val; den += poids;
         }
-        const [r, g, b] = couleurPour(num / den, min, max);
-        const idx = (j * w + i) * 4;
-        img.data[idx] = r; img.data[idx + 1] = g; img.data[idx + 2] = b; img.data[idx + 3] = 255;
+        grille[idx] = num / den;
       }
     }
-    octx.putImageData(img, 0, 0);
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(off, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+
+    for (let j = 0; j < h - 1; j++) {
+      for (let i = 0; i < w - 1; i++) {
+        const idx = j * w + i;
+        if (!dansZone[idx]) continue;
+        const v = palier(grille[idx], PAS_COULEUR);
+        const [r, g, b] = couleurPour(v, min, max);
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(i * RES, j * RES, RES + 1, RES + 1);
+      }
+    }
+    const tracerLignes = (pas, style, largeur) => {
+      ctx.strokeStyle = style;
+      ctx.lineWidth = largeur;
+      ctx.beginPath();
+      for (let j = 0; j < h - 1; j++) {
+        for (let i = 0; i < w - 1; i++) {
+          const idx = j * w + i;
+          if (!dansZone[idx]) continue;
+          const v = grille[idx];
+          if (i < w - 2 && dansZone[idx + 1]) {
+            const vD = grille[idx + 1];
+            if (Math.floor(v / pas) !== Math.floor(vD / pas)) {
+              ctx.moveTo((i + 1) * RES, j * RES);
+              ctx.lineTo((i + 1) * RES, (j + 1) * RES);
+            }
+          }
+          if (j < h - 2 && dansZone[idx + w]) {
+            const vB = grille[idx + w];
+            if (Math.floor(v / pas) !== Math.floor(vB / pas)) {
+              ctx.moveTo(i * RES, (j + 1) * RES);
+              ctx.lineTo((i + 1) * RES, (j + 1) * RES);
+            }
+          }
+        }
+      }
+      ctx.stroke();
+    };
+    tracerLignes(PAS_ISOLIGNE, 'rgba(35,40,31,0.45)', 1);
+    tracerLignes(PAS_ISOLIGNE_EPAIS, 'rgba(35,40,31,0.85)', 2.2);
   },
 });
 
@@ -264,10 +267,8 @@ async function init() {
 
   const map = L.map('carte').setView(centre, 10);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-    maxZoom: 18
+    attribution: '&copy; OpenStreetMap contributors', maxZoom: 18
   }).addTo(map);
-
   map.fitBounds([[zone.lat_min, zone.lon_min], [zone.lat_max, zone.lon_max]], {padding: [20, 20]});
 
   let data;
@@ -275,31 +276,27 @@ async function init() {
     const res = await fetch('data/latest.json?_=' + Date.now());
     data = await res.json();
   } catch (e) {
-    document.getElementById('sous-titre').textContent =
-      "Données pas encore générées — lance le pipeline.";
+    document.getElementById('sous-titre').textContent = "Données pas encore générées — lance le pipeline.";
     return;
   }
 
   const stations = data.stations || [];
   if (!stations.length) {
-    document.getElementById('sous-titre').textContent =
-      "Aucune station avec prévision pour l'instant.";
+    document.getElementById('sous-titre').textContent = "Aucune station avec prévision pour l'instant.";
     return;
   }
 
   document.getElementById('sous-titre').textContent =
     `Prévision pour le ${stations[0].date_prevue} — générée le ${data.generated_at}`;
 
-  // Champ de couleur interpole (Tx par defaut)
-  const champ = new ChampTemperature(stations, 'tx');
+  const champ = new ChampTemperature(stations, 'tx', zone);
   champ.addTo(map);
 
-  // Legende, mise a jour a chaque redessin du champ
   const barre = document.getElementById('legende-barre');
   barre.style.background = `linear-gradient(to right, ${STOPS.map(s => `rgb(${s[1].join(',')})`).join(', ')})`;
   document.addEventListener('champ-echelle', (e) => {
-    document.getElementById('legende-min').textContent = e.detail.min.toFixed(0) + '°';
-    document.getElementById('legende-max').textContent = e.detail.max.toFixed(0) + '°';
+    document.getElementById('legende-min').textContent = e.detail.min.toFixed(1) + '°';
+    document.getElementById('legende-max').textContent = e.detail.max.toFixed(1) + '°';
     document.getElementById('legende-titre').textContent =
       (e.detail.field === 'tx' ? 'Tx corrigée (°C)' : 'Tn corrigée (°C)');
   });
@@ -315,7 +312,6 @@ async function init() {
     document.getElementById('btn-tx').classList.remove('actif');
   });
 
-  // Points des stations, par-dessus le champ de couleur
   stations.forEach(st => {
     const marker = L.circleMarker([st.lat, st.lon], {
       radius: 5, color: '#23281f', weight: 1.5, fillColor: '#fff', fillOpacity: 0.95
@@ -338,6 +334,20 @@ async function init() {
       </div>
     `);
   });
+
+  const infoBulle = document.getElementById('curseur-info');
+  map.on('mousemove', (e) => {
+    if (!champ.dansLaZone(e.latlng.lat, e.latlng.lng)) {
+      infoBulle.style.display = 'none';
+      return;
+    }
+    const v = champ.valeurEn(e.latlng.lat, e.latlng.lng);
+    infoBulle.textContent = v.toFixed(1) + '°C';
+    infoBulle.style.left = e.containerPoint.x + 'px';
+    infoBulle.style.top = e.containerPoint.y + 'px';
+    infoBulle.style.display = 'block';
+  });
+  map.on('mouseout', () => { infoBulle.style.display = 'none'; });
 }
 
 init();
