@@ -1,10 +1,7 @@
 name: Mise à jour prévisions Gard rhodanien
 
 on:
-  schedule:
-    # 14h30 UTC : laisse ~2h30 au run ICON-CH1 12z pour être calculé et publié.
-    # Si RUN_HOUR_UTC est passé à 15 dans le script, décaler ce cron vers 17h30.
-    - cron: "30 14 * * *"
+
   workflow_dispatch: {}   # permet de le lancer manuellement depuis GitHub
 
 permissions:
