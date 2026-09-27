@@ -106,10 +106,21 @@ def fetch_grille_brute(points, run_date):
         print(f"  [!] Grille brute: echec de la requete: {e}", file=sys.stderr)
         return None
 
-    if isinstance(data, dict):  # un seul point renvoie un objet, pas une liste
-        data = [data]
+        if isinstance(data, dict):
+        if "error" in data or "reason" in data:
+            print(f"  [!] Grille brute: l'API a renvoye une erreur : {data}", file=sys.stderr)
+            return None
+        data = [data]  # un seul point demande -> l'API renvoie un objet, pas une liste
+
+    if len(data) != len(points):
+        print(
+            f"  [!] Grille brute: {len(data)} resultats recus pour {len(points)} points demandes "
+            f"(reponse tronquee ou format inattendu). Extrait: {str(data)[:400]}",
+            file=sys.stderr,
+        )
 
     resultat = []
+    premiere_erreur = None
     for (la, lo), item in zip(points, data):
         try:
             idx = item["daily"]["time"].index(target_day.isoformat())
@@ -118,10 +129,15 @@ def fetch_grille_brute(points, run_date):
             if tx is None or tn is None:
                 continue
             resultat.append({"lat": round(la, 4), "lon": round(lo, 4), "tx": round(tx, 1), "tn": round(tn, 1)})
-        except (KeyError, ValueError, IndexError, TypeError):
+        except (KeyError, ValueError, IndexError, TypeError) as e:
+            if premiere_erreur is None:
+                premiere_erreur = (e, item)
             continue
 
     if not resultat:
+        if premiere_erreur:
+            e, item = premiere_erreur
+            print(f"  [!] Grille brute: erreur de parsing ({e}). Exemple d'item recu: {str(item)[:400]}", file=sys.stderr)
         print("  [!] Grille brute: aucun point valide dans la reponse.", file=sys.stderr)
         return None
 
