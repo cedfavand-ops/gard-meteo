@@ -18,6 +18,7 @@ scripts/fetch_stations_metadata.py si ce n'est pas deja fait).
 
 import csv
 import json
+import math
 import os
 import sys
 from datetime import date, datetime, timedelta
@@ -32,9 +33,14 @@ STATIONS_FILE = ROOT / "stations.json"
 HISTORY_FILE = ROOT / "data" / "history.csv"
 BIAS_FILE = ROOT / "data" / "bias.json"
 LATEST_FILE = ROOT / "data" / "latest.json"
+GRID_FILE = ROOT / "data" / "grille_brute.json"
 
 ALPHA = 0.25
 RUN_HOUR_UTC = 12  # ou 15, selon ta préférence
+
+# Espacement approximatif (km) entre points de la grille brute ICON-CH1
+# affichee en fond de carte (independamment des 17 stations).
+GRID_STEP_KM = 6.0
 
 INFOCLIMAT_API_KEY = os.environ.get("INFOCLIMAT_API_KEY")
 
@@ -52,7 +58,81 @@ def save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+def build_grid(zone, step_km=GRID_STEP_KM):
+    """Genere une grille reguliere de points lat/lon couvrant la zone,
+    espaces d'environ step_km kilometres."""
+    bbox = zone["bbox"]
+    lat_min, lat_max = bbox["lat_min"], bbox["lat_max"]
+    lon_min, lon_max = bbox["lon_min"], bbox["lon_max"]
+    lat_mean = (lat_min + lat_max) / 2
+    km_par_deg_lat = 111.32
+    km_par_deg_lon = 111.32 * math.cos(math.radians(lat_mean))
+
+    n_lat = max(2, round((lat_max - lat_min) * km_par_deg_lat / step_km) + 1)
+    n_lon = max(2, round((lon_max - lon_min) * km_par_deg_lon / step_km) + 1)
+
+    lats = [lat_min + i * (lat_max - lat_min) / (n_lat - 1) for i in range(n_lat)]
+    lons = [lon_min + j * (lon_max - lon_min) / (n_lon - 1) for j in range(n_lon)]
+    return [(la, lo) for la in lats for lo in lons]
+
+
+def fetch_grille_brute(points, run_date):
+    """
+    Recupere la prevision ICON-CH1 brute (Tn/Tx de demain) pour TOUS les
+    points de la grille en un seul appel, via la fonctionnalite multi-lieux
+    de l'API standard Open-Meteo (listes de latitudes/longitudes separees
+    par des virgules -> l'API renvoie une LISTE de resultats, un par point).
+
+    Retourne { "date_prevue": ..., "points": [{"lat","lon","tx","tn"}, ...] }
+    ou None si l'appel echoue (le pipeline continue alors sans fond brut).
+    """
+    target_day = run_date + timedelta(days=1)
+    url = "https://api.open-meteo.com/v1/forecast"
+    params = {
+        "latitude": ",".join(f"{la:.4f}" for la, lo in points),
+        "longitude": ",".join(f"{lo:.4f}" for la, lo in points),
+        "daily": "temperature_2m_max,temperature_2m_min",
+        "models": "meteoswiss_icon_ch1",
+        "timezone": "Europe/Paris",
+        "forecast_days": 2,
+    }
+    try:
+        r = requests.get(url, params=params, timeout=60)
+        if not r.ok:
+            print(f"  [!] Grille brute: erreur {r.status_code} : {r.text[:300]}", file=sys.stderr)
+            return None
+        data = r.json()
+    except Exception as e:
+        print(f"  [!] Grille brute: echec de la requete: {e}", file=sys.stderr)
+        return None
+
+    if isinstance(data, dict):  # un seul point renvoie un objet, pas une liste
+        data = [data]
+
+    resultat = []
+    for (la, lo), item in zip(points, data):
+        try:
+            idx = item["daily"]["time"].index(target_day.isoformat())
+            tx = item["daily"]["temperature_2m_max"][idx]
+            tn = item["daily"]["temperature_2m_min"][idx]
+            if tx is None or tn is None:
+                continue
+            resultat.append({"lat": round(la, 4), "lon": round(lo, 4), "tx": round(tx, 1), "tn": round(tn, 1)})
+        except (KeyError, ValueError, IndexError, TypeError):
+            continue
+
+    if not resultat:
+        print("  [!] Grille brute: aucun point valide dans la reponse.", file=sys.stderr)
+        return None
+
+    return {"date_prevue": target_day.isoformat(), "points": resultat}
+
+
 def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
+    """
+    Prevision Tn/Tx de demain (ICON-CH1, MeteoSuisse), pour un run precis
+    (ex: le 12z du jour), via la Single Runs API d'Open-Meteo.
+    """
     run_iso = f"{run_date.isoformat()}T{run_hour:02d}:00"
     target_day = run_date + timedelta(days=1)
 
@@ -66,6 +146,24 @@ def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
         "timezone": "Europe/Paris",
     }
     r = requests.get(url, params=params, timeout=30)
+
+    if r.status_code == 400 and "not available" in r.text.lower():
+        print(
+            f"  [!] Run {run_iso} pas encore disponible sur Single Runs API, "
+            f"repli sur le dernier run disponible.",
+            file=sys.stderr,
+        )
+        url_fallback = "https://api.open-meteo.com/v1/forecast"
+        params_fallback = {
+            "latitude": lat,
+            "longitude": lon,
+            "hourly": "temperature_2m",
+            "models": "meteoswiss_icon_ch1",
+            "timezone": "Europe/Paris",
+            "forecast_days": 2,
+        }
+        r = requests.get(url_fallback, params=params_fallback, timeout=30)
+
     if not r.ok:
         print(f"  [!] Open-Meteo a renvoye une erreur {r.status_code} : {r.text[:500]}", file=sys.stderr)
     r.raise_for_status()
@@ -193,6 +291,15 @@ def main():
 
     codes = [s["infoclimat_code"] for s in stations_ok]
     obs_today_par_code = fetch_infoclimat_obs_batch(codes, today)
+
+    print("-> Grille brute ICON-CH1 (fond de carte)")
+    points_grille = build_grid(config.get("zone", {}))
+    print(f"   {len(points_grille)} points de grille")
+    grille = fetch_grille_brute(points_grille, today)
+    if grille:
+        save_json(GRID_FILE, grille)
+    else:
+        print("  [!] Grille brute non mise a jour ce jour (ancienne version conservee si presente).", file=sys.stderr)
 
     latest = {"generated_at": today.isoformat(), "zone": config.get("zone"), "stations": []}
     history_rows = []
