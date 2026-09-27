@@ -362,7 +362,7 @@ def main():
         update_bias(bias_store, sid, obs, prev_fcst_for_veille)
 
         obs = obs_veille_par_code.get(code)
-        update_bias(bias_store, sid, obs, prev_fcst_for_today)
+        update_bias(bias_store, sid, obs, prev_fcst_for_veille)
 
         bias = bias_store.get(sid, {"bias_tn": 0.0, "bias_tx": 0.0})
         corrected = {
