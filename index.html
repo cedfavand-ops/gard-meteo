@@ -128,10 +128,18 @@ function palier(v, pas) { return Math.floor(v / pas + 1e-9) * pas; }
 const PAS_COULEUR = 0.5;
 const PAS_ISOLIGNE = 1;
 const PAS_ISOLIGNE_EPAIS = 5;
-const RES = 5; // taille de cellule de la grille de calcul, en pixels ecran
+const RES = 6; // taille de cellule de la grille de calcul, en pixels ecran
+const RAYON_CORRECTION_M = 2000; // halo de correction autour de chaque station
 
+// Couche Leaflet : fond de carte = grille brute ICON-CH1 (dense, ~200 points
+// sur toute la zone), avec une correction ADDITIVE locale (le biais appris
+// par station) qui ne s'applique qu'a l'interieur d'un halo de
+// RAYON_CORRECTION_M autour de chaque station, en s'attenuant lineairement
+// jusqu'a 0 au bord du halo. Loin de toute station, on voit donc le modele
+// brut ; pres d'une station, la valeur est corrigee par son historique.
 const ChampTemperature = L.Layer.extend({
-  initialize(stations, field, zone) {
+  initialize(grillePoints, stations, field, zone) {
+    this._grille = grillePoints;
     this._stations = stations;
     this._field = field;
     this._zone = zone;
@@ -143,35 +151,59 @@ const ChampTemperature = L.Layer.extend({
     this._canvas.style.pointerEvents = 'none';
     this._canvas.style.opacity = '0.62';
     map.getPanes().overlayPane.appendChild(this._canvas);
-    map.on('move zoom resize', this._redraw, this);
+    map.on('moveend zoomend resize', this._redraw, this);
     this._redraw();
   },
   onRemove(map) {
     L.DomUtil.remove(this._canvas);
-    map.off('move zoom resize', this._redraw, this);
+    map.off('moveend zoomend resize', this._redraw, this);
   },
   setField(field) {
     this._field = field;
     this._redraw();
   },
-  valeurEn(lat, lon) {
-    const map = this._map;
-    const pt = map.latLngToContainerPoint([lat, lon]);
-    let num = 0, den = 0;
-    for (const s of this._stations) {
-      const spt = map.latLngToContainerPoint([s.lat, s.lon]);
-      const dx = pt.x - spt.x, dy = pt.y - spt.y;
-      let d2 = dx * dx + dy * dy;
-      if (d2 < 400) d2 = 400;
-      const poids = 1 / d2;
-      num += poids * s.corrigee[this._field];
-      den += poids;
-    }
-    return num / den;
-  },
   dansLaZone(lat, lon) {
     return lat <= this._zone.lat_max && lat >= this._zone.lat_min &&
            lon >= this._zone.lon_min && lon <= this._zone.lon_max;
+  },
+  _brutEnPixel(px, py, pointsPix) {
+    let num = 0, den = 0;
+    for (const p of pointsPix) {
+      const dx = px - p.x, dy = py - p.y;
+      let d2 = dx * dx + dy * dy;
+      if (d2 < 400) d2 = 400;
+      const poids = 1 / d2;
+      num += poids * p.val; den += poids;
+    }
+    return num / den;
+  },
+  _correctionEnPixel(px, py, stationsPix) {
+    let total = 0;
+    for (const s of stationsPix) {
+      const dx = px - s.x, dy = py - s.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d >= s.rayonPx) continue;
+      total += (1 - d / s.rayonPx) * s.bias;
+    }
+    return total;
+  },
+  _prepStationsPix(map) {
+    return this._stations.map(s => {
+      const p = map.latLngToContainerPoint([s.lat, s.lon]);
+      const pNord = map.latLngToContainerPoint([s.lat + RAYON_CORRECTION_M / 111320, s.lon]);
+      const rayonPx = Math.max(1, Math.hypot(p.x - pNord.x, p.y - pNord.y));
+      return { x: p.x, y: p.y, rayonPx, bias: s.biais_applique[this._field] };
+    });
+  },
+  valeurEn(lat, lon) {
+    const map = this._map;
+    const pt = map.latLngToContainerPoint([lat, lon]);
+    const pointsPix = this._grille.map(g => {
+      const p = map.latLngToContainerPoint([g.lat, g.lon]);
+      return { x: p.x, y: p.y, val: g[this._field] };
+    });
+    const stationsPix = this._prepStationsPix(map);
+    return this._brutEnPixel(pt.x, pt.y, pointsPix) + this._correctionEnPixel(pt.x, pt.y, stationsPix);
   },
   _redraw() {
     if (!this._map) return;
@@ -182,19 +214,17 @@ const ChampTemperature = L.Layer.extend({
     canvas.height = size.y;
     L.DomUtil.setPosition(canvas, map.containerPointToLayerPoint([0, 0]));
 
-    const valeurs = this._stations.map(s => s.corrigee[this._field]);
-    const min = Math.min(...valeurs), max = Math.max(...valeurs);
-    document.dispatchEvent(new CustomEvent('champ-echelle', {detail: {min, max, field: this._field}}));
-
-    const stationsPix = this._stations.map(s => ({
-      pt: map.latLngToContainerPoint([s.lat, s.lon]),
-      val: s.corrigee[this._field],
-    }));
+    const pointsPix = this._grille.map(g => {
+      const p = map.latLngToContainerPoint([g.lat, g.lon]);
+      return { x: p.x, y: p.y, val: g[this._field] };
+    });
+    const stationsPix = this._prepStationsPix(map);
 
     const w = Math.ceil(size.x / RES) + 1, h = Math.ceil(size.y / RES) + 1;
     const grille = new Float32Array(w * h);
     const dansZone = new Uint8Array(w * h);
 
+    let min = Infinity, max = -Infinity;
     for (let j = 0; j < h; j++) {
       for (let i = 0; i < w; i++) {
         const px = i * RES, py = j * RES;
@@ -202,17 +232,14 @@ const ChampTemperature = L.Layer.extend({
         const idx = j * w + i;
         if (!this.dansLaZone(latlng.lat, latlng.lng)) { dansZone[idx] = 0; continue; }
         dansZone[idx] = 1;
-        let num = 0, den = 0;
-        for (const s of stationsPix) {
-          const dx = px - s.pt.x, dy = py - s.pt.y;
-          let d2 = dx * dx + dy * dy;
-          if (d2 < 400) d2 = 400;
-          const poids = 1 / d2;
-          num += poids * s.val; den += poids;
-        }
-        grille[idx] = num / den;
+        const v = this._brutEnPixel(px, py, pointsPix) + this._correctionEnPixel(px, py, stationsPix);
+        grille[idx] = v;
+        if (v < min) min = v;
+        if (v > max) max = v;
       }
     }
+    if (!isFinite(min)) { min = 0; max = 1; }
+    document.dispatchEvent(new CustomEvent('champ-echelle', {detail: {min, max, field: this._field}}));
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -272,7 +299,7 @@ async function init() {
   }).addTo(map);
   map.fitBounds([[zone.lat_min, zone.lon_min], [zone.lat_max, zone.lon_max]], {padding: [20, 20]});
 
-  let data;
+  let data, grilleBrute;
   try {
     const res = await fetch('data/latest.json?_=' + Date.now());
     data = await res.json();
@@ -280,17 +307,27 @@ async function init() {
     document.getElementById('sous-titre').textContent = "Données pas encore générées — lance le pipeline.";
     return;
   }
+  try {
+    const resG = await fetch('data/grille_brute.json?_=' + Date.now());
+    grilleBrute = (await resG.json()).points || [];
+  } catch (e) {
+    grilleBrute = [];
+  }
 
   const stations = data.stations || [];
   if (!stations.length) {
     document.getElementById('sous-titre').textContent = "Aucune station avec prévision pour l'instant.";
     return;
   }
+  if (!grilleBrute.length) {
+    document.getElementById('sous-titre').textContent += " (grille brute indisponible, repli sur les stations seules)";
+    grilleBrute = stations.map(s => ({lat: s.lat, lon: s.lon, tx: s.brute.tx, tn: s.brute.tn}));
+  }
 
   document.getElementById('sous-titre').textContent =
     `Prévision pour le ${stations[0].date_prevue} — générée le ${data.generated_at}`;
 
-  const champ = new ChampTemperature(stations, 'tx', zone);
+  const champ = new ChampTemperature(grilleBrute, stations, 'tx', zone);
   champ.addTo(map);
 
   const barre = document.getElementById('legende-barre');
