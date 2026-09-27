@@ -40,7 +40,8 @@ RUN_HOUR_UTC = 12  # ou 15, selon ta préférence
 
 # Espacement approximatif (km) entre points de la grille brute ICON-CH1
 # affichee en fond de carte (independamment des 17 stations).
-GRID_STEP_KM = 6.0
+GRID_STEP_KM = 1.1
+MAX_POINTS_PAR_APPEL = 300
 
 INFOCLIMAT_API_KEY = os.environ.get("INFOCLIMAT_API_KEY")
 
@@ -79,14 +80,27 @@ def build_grid(zone, step_km=GRID_STEP_KM):
 def fetch_grille_brute(points, run_date):
     """
     Recupere la prevision ICON-CH1 brute (Tn/Tx de demain) pour TOUS les
-    points de la grille en un seul appel, via la fonctionnalite multi-lieux
-    de l'API standard Open-Meteo (listes de latitudes/longitudes separees
-    par des virgules -> l'API renvoie une LISTE de resultats, un par point).
-
-    Retourne { "date_prevue": ..., "points": [{"lat","lon","tx","tn"}, ...] }
-    ou None si l'appel echoue (le pipeline continue alors sans fond brut).
+    points de la grille, en la decoupant en plusieurs appels de
+    MAX_POINTS_PAR_APPEL points (l'URL deviendrait trop longue sinon).
     """
     target_day = run_date + timedelta(days=1)
+    tous_resultats = []
+    for i in range(0, len(points), MAX_POINTS_PAR_APPEL):
+        lot = points[i:i + MAX_POINTS_PAR_APPEL]
+        print(f"   lot {i // MAX_POINTS_PAR_APPEL + 1}/{-(-len(points) // MAX_POINTS_PAR_APPEL)} ({len(lot)} points)")
+        resultat_lot = _fetch_grille_chunk(lot, target_day)
+        if resultat_lot:
+            tous_resultats.extend(resultat_lot)
+
+    if not tous_resultats:
+        print("  [!] Grille brute: aucun point valide recupere (tous les lots ont echoue).", file=sys.stderr)
+        return None
+
+    return {"date_prevue": target_day.isoformat(), "points": tous_resultats}
+
+
+def _fetch_grille_chunk(points, target_day):
+    """Un seul appel Open-Meteo pour un lot de points."""
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": ",".join(f"{la:.4f}" for la, lo in points),
@@ -143,13 +157,10 @@ def fetch_grille_brute(points, run_date):
         if premiere_erreur:
             e, item = premiere_erreur
             print(f"  [!] Grille brute: erreur de parsing ({e}). Exemple d'item recu: {str(item)[:400]}", file=sys.stderr)
-        print("  [!] Grille brute: aucun point valide dans la reponse.", file=sys.stderr)
+        print("  [!] Grille brute: aucun point valide dans ce lot.", file=sys.stderr)
         return None
 
-    return {"date_prevue": target_day.isoformat(), "points": resultat}
-
-
-
+    return resultat
 
 def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
     """
