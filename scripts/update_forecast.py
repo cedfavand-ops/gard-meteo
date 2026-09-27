@@ -91,7 +91,7 @@ def fetch_grille_brute(points, run_date):
     params = {
         "latitude": ",".join(f"{la:.4f}" for la, lo in points),
         "longitude": ",".join(f"{lo:.4f}" for la, lo in points),
-        "daily": "temperature_2m_max,temperature_2m_min",
+        "hourly": "temperature_2m",
         "models": "meteoswiss_icon_ch1",
         "timezone": "Europe/Paris",
         "forecast_days": 2,
@@ -123,12 +123,17 @@ def fetch_grille_brute(points, run_date):
     premiere_erreur = None
     for (la, lo), item in zip(points, data):
         try:
-            idx = item["daily"]["time"].index(target_day.isoformat())
-            tx = item["daily"]["temperature_2m_max"][idx]
-            tn = item["daily"]["temperature_2m_min"][idx]
-            if tx is None or tn is None:
+            hourly = item["hourly"]
+            temps_du_jour = [
+                t for time_str, t in zip(hourly["time"], hourly["temperature_2m"])
+                if time_str.startswith(target_day.isoformat()) and t is not None
+            ]
+            if not temps_du_jour:
                 continue
-            resultat.append({"lat": round(la, 4), "lon": round(lo, 4), "tx": round(tx, 1), "tn": round(tn, 1)})
+            resultat.append({
+                "lat": round(la, 4), "lon": round(lo, 4),
+                "tx": round(max(temps_du_jour), 1), "tn": round(min(temps_du_jour), 1),
+            })
         except (KeyError, ValueError, IndexError, TypeError) as e:
             if premiere_erreur is None:
                 premiere_erreur = (e, item)
