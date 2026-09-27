@@ -106,11 +106,11 @@ def fetch_grille_brute(points, run_date):
         print(f"  [!] Grille brute: echec de la requete: {e}", file=sys.stderr)
         return None
 
-        if isinstance(data, dict):
+    if isinstance(data, dict):
         if "error" in data or "reason" in data:
             print(f"  [!] Grille brute: l'API a renvoye une erreur : {data}", file=sys.stderr)
             return None
-        data = [data]  # un seul point demande -> l'API renvoie un objet, pas une liste
+        data = [data]
 
     if len(data) != len(points):
         print(
@@ -142,6 +142,8 @@ def fetch_grille_brute(points, run_date):
         return None
 
     return {"date_prevue": target_day.isoformat(), "points": resultat}
+
+
 
 
 def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
