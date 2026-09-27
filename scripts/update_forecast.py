@@ -312,8 +312,14 @@ def main():
             file=sys.stderr,
         )
 
+    # Un seul appel Infoclimat pour toutes les stations d'un coup.
+    # On verifie la prevision par rapport a HIER (une journee forcement
+    # terminee), jamais "aujourd'hui" -- sinon, si le script tourne avant
+    # que la Tx du jour ait eu lieu (typiquement 15h-17h), l'observation
+    # serait incomplete et fausserait le biais vers le bas a chaque lancement.
     codes = [s["infoclimat_code"] for s in stations_ok]
-    obs_today_par_code = fetch_infoclimat_obs_batch(codes, today)
+    veille = today - timedelta(days=1)
+    obs_veille_par_code = fetch_infoclimat_obs_batch(codes, veille)
 
     print("-> Grille brute ICON-CH1 (fond de carte)")
     points_grille = build_grid(config.get("zone", {}))
@@ -338,15 +344,22 @@ def main():
             print(f"  [!] Prevision impossible pour {st['nom']}: {e}", file=sys.stderr)
             continue
 
-        prev_fcst_for_today = None
+        # 2) prevision qui avait ete faite il y a 2 jours pour HIER (relue
+        #    dans l'historique local) + observation reelle d'hier -> biais.
+        #    Hier est toujours une journee complete, quelle que soit l'heure
+        #    a laquelle ce script est lance aujourd'hui.
+        prev_fcst_for_veille = None
         if HISTORY_FILE.exists():
             with open(HISTORY_FILE, encoding="utf-8") as f:
                 for row in csv.DictReader(f):
-                    if row["station_id"] == sid and row["date_prevue"] == today.isoformat():
-                        prev_fcst_for_today = {
+                    if row["station_id"] == sid and row["date_prevue"] == veille.isoformat():
+                        prev_fcst_for_veille = {
                             "tn": float(row["prevision_brute_tn"]),
                             "tx": float(row["prevision_brute_tx"]),
                         }
+
+        obs = obs_veille_par_code.get(code)
+        update_bias(bias_store, sid, obs, prev_fcst_for_veille)
 
         obs = obs_today_par_code.get(code)
         update_bias(bias_store, sid, obs, prev_fcst_for_today)
