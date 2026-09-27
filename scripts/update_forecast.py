@@ -40,7 +40,7 @@ RUN_HOUR_UTC = 12  # ou 15, selon ta préférence
 
 # Espacement approximatif (km) entre points de la grille brute ICON-CH1
 # affichee en fond de carte (independamment des 17 stations).
-GRID_STEP_KM = 1.1
+GRID_STEP_KM = 2
 MAX_POINTS_PAR_APPEL = 300
 
 INFOCLIMAT_API_KEY = os.environ.get("INFOCLIMAT_API_KEY")
