@@ -1,1 +1,46 @@
-{}
+{
+  "saint-paul-les-fonts": {
+    "bias_tn": -0.7874999999999995,
+    "bias_tx": -0.17499999999999938
+  },
+  "viviers": {
+    "bias_tn": -0.17499999999999938,
+    "bias_tx": 0.04374999999999907
+  },
+  "montjoyer": {
+    "bias_tn": 0.08749999999999969,
+    "bias_tx": 0.21875
+  },
+  "saint-paul-trois-chateaux": {
+    "bias_tn": -0.04374999999999907,
+    "bias_tx": 0.1312500000000003
+  },
+  "dent-de-rez": {
+    "bias_tn": 0.21875,
+    "bias_tx": 0.04374999999999907
+  },
+  "bollene": {
+    "bias_tn": -0.5687499999999995,
+    "bias_tx": 0.08749999999999969
+  },
+  "sorgues": {
+    "bias_tn": 0.5687500000000003,
+    "bias_tx": -0.5250000000000012
+  },
+  "montaren-et-saint-mediers": {
+    "bias_tn": 0.08750000000000047,
+    "bias_tx": -0.6124999999999994
+  },
+  "lussan-la-leque": {
+    "bias_tn": -2.406250000000001,
+    "bias_tx": 0.08750000000000124
+  },
+  "saint-hilaire-de-brethmas": {
+    "bias_tn": 0.08750000000000047,
+    "bias_tx": -0.48124999999999907
+  },
+  "malbosc": {
+    "bias_tn": 1.3562499999999997,
+    "bias_tx": -0.4375
+  }
+}
