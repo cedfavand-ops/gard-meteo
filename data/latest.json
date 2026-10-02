@@ -275,25 +275,6 @@
         "tn": -0.65,
         "tx": -0.61
       }
-    },
-    {
-      "id": "lussan-la-leque",
-      "nom": "Lussan (la Lèque)",
-      "lat": 44.189,
-      "lon": 4.36,
-      "date_prevue": "2026-10-03",
-      "brute": {
-        "tn": 17.1,
-        "tx": 19.5
-      },
-      "corrigee": {
-        "tn": 13.2,
-        "tx": 19.8
-      },
-      "biais_applique": {
-        "tn": -3.89,
-        "tx": 0.27
-      }
     }
   ]
 }
