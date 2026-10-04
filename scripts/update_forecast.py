@@ -21,6 +21,7 @@ import json
 import math
 import os
 import sys
+import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
@@ -35,15 +36,50 @@ BIAS_FILE = ROOT / "data" / "bias.json"
 LATEST_FILE = ROOT / "data" / "latest.json"
 GRID_FILE = ROOT / "data" / "grille_brute.json"
 
+# Poids donné à la nouvelle erreur dans la moyenne mobile exponentielle.
+# 0.2-0.3 = correction progressive et stable ; plus haut = réagit plus vite
+# mais plus bruité.
 ALPHA = 0.25
+
+# Heure (UTC) du run ICON-CH1 à utiliser systématiquement. ICON-CH1 tourne
+# toutes les 3h (00,03,06,09,12,15,18,21). Fixer un run précis (plutôt que de
+# laisser l'API renvoyer "le dernier run disponible", qui change selon
+# l'heure d'exécution du script) garantit une prévision comparable jour
+# après jour -- important pour que la correction de biais ait un sens.
 RUN_HOUR_UTC = 12  # ou 15, selon ta préférence
 
 # Espacement approximatif (km) entre points de la grille brute ICON-CH1
-# affichee en fond de carte (independamment des 17 stations).
-GRID_STEP_KM = 2
+# affichee en fond de carte. La resolution native d'ICON-CH1 est d'environ
+# 1 km ; on ne peut pas etre plus precis que ca de toute facon.
+GRID_STEP_KM = 2.0
+
+# Nombre max de points par appel Open-Meteo (au-dela, l'URL devient trop
+# longue) -- la grille est decoupee en plusieurs appels successifs si besoin.
 MAX_POINTS_PAR_APPEL = 300
 
 INFOCLIMAT_API_KEY = os.environ.get("INFOCLIMAT_API_KEY")
+
+
+def get_avec_repli(url, params, timeout=60, max_tentatives=3):
+    """
+    Comme requests.get, mais si l'API renvoie 429 (limite de requetes par
+    minute depassee), attend 65 secondes et reessaie, jusqu'a max_tentatives
+    fois. Open-Meteo limite le nombre d'appels par minute ; avec des
+    centaines de points de grille repartis en plusieurs appels, on finit
+    par la depasser sans cette precaution.
+    """
+    for tentative in range(1, max_tentatives + 1):
+        r = requests.get(url, params=params, timeout=timeout)
+        if r.status_code != 429:
+            return r
+        if tentative < max_tentatives:
+            print(
+                f"  [!] Limite de requetes atteinte (429), pause de 65s avant nouvelle tentative "
+                f"({tentative}/{max_tentatives})...",
+                file=sys.stderr,
+            )
+            time.sleep(65)
+    return r
 
 
 def load_json(path, default):
@@ -82,6 +118,9 @@ def fetch_grille_brute(points, run_date):
     Recupere la prevision ICON-CH1 brute (Tn/Tx de demain) pour TOUS les
     points de la grille, en la decoupant en plusieurs appels de
     MAX_POINTS_PAR_APPEL points (l'URL deviendrait trop longue sinon).
+
+    Retourne { "date_prevue": ..., "points": [{"lat","lon","tx","tn"}, ...] }
+    ou None si aucun lot n'a pu etre recupere.
     """
     target_day = run_date + timedelta(days=1)
     tous_resultats = []
@@ -91,6 +130,7 @@ def fetch_grille_brute(points, run_date):
         resultat_lot = _fetch_grille_chunk(lot, target_day)
         if resultat_lot:
             tous_resultats.extend(resultat_lot)
+        time.sleep(3)  # limite le risque d'atteindre le quota de requetes/minute
 
     if not tous_resultats:
         print("  [!] Grille brute: aucun point valide recupere (tous les lots ont echoue).", file=sys.stderr)
@@ -100,7 +140,7 @@ def fetch_grille_brute(points, run_date):
 
 
 def _fetch_grille_chunk(points, target_day):
-    """Un seul appel Open-Meteo pour un lot de points."""
+    """Un seul appel Open-Meteo pour un lot de points (voir fetch_grille_brute)."""
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": ",".join(f"{la:.4f}" for la, lo in points),
@@ -111,7 +151,7 @@ def _fetch_grille_chunk(points, target_day):
         "forecast_days": 2,
     }
     try:
-        r = requests.get(url, params=params, timeout=60)
+        r = get_avec_repli(url, params, timeout=60)
         if not r.ok:
             print(f"  [!] Grille brute: erreur {r.status_code} : {r.text[:300]}", file=sys.stderr)
             return None
@@ -124,7 +164,7 @@ def _fetch_grille_chunk(points, target_day):
         if "error" in data or "reason" in data:
             print(f"  [!] Grille brute: l'API a renvoye une erreur : {data}", file=sys.stderr)
             return None
-        data = [data]
+        data = [data]  # un seul point demande -> l'API renvoie un objet, pas une liste
 
     if len(data) != len(points):
         print(
@@ -162,13 +202,18 @@ def _fetch_grille_chunk(points, target_day):
 
     return resultat
 
+
 def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
     """
     Prevision Tn/Tx de demain (ICON-CH1, MeteoSuisse), pour un run precis
     (ex: le 12z du jour), via la Single Runs API d'Open-Meteo.
+
+    On demande la temperature horaire (pas l'agregat "daily" tout fait, qui
+    n'est pas garanti sur cet endpoint) et on calcule nous-memes le Tn/Tx du
+    jour cible a partir des valeurs horaires -- plus robuste.
     """
     run_iso = f"{run_date.isoformat()}T{run_hour:02d}:00"
-    target_day = run_date + timedelta(days=1)
+    target_day = run_date + timedelta(days=1)  # le run de J sert a prevoir J+1
 
     url = "https://single-runs-api.open-meteo.com/v1/forecast"
     params = {
@@ -179,7 +224,7 @@ def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
         "run": run_iso,
         "timezone": "Europe/Paris",
     }
-    r = requests.get(url, params=params, timeout=30)
+    r = get_avec_repli(url, params, timeout=30)
 
     if r.status_code == 400 and "not available" in r.text.lower():
         print(
@@ -196,7 +241,7 @@ def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
             "timezone": "Europe/Paris",
             "forecast_days": 2,
         }
-        r = requests.get(url_fallback, params=params_fallback, timeout=30)
+        r = get_avec_repli(url_fallback, params_fallback, timeout=30)
 
     if not r.ok:
         print(f"  [!] Open-Meteo a renvoye une erreur {r.status_code} : {r.text[:500]}", file=sys.stderr)
@@ -221,6 +266,10 @@ def fetch_icon_ch1_forecast(lat, lon, run_date, run_hour=RUN_HOUR_UTC):
 
 
 def fetch_infoclimat_obs_batch(codes, day):
+    """
+    Un seul appel Infoclimat (version=2) pour recuperer les observations
+    d'une journee LOCALE (Europe/Paris) pour TOUTES les stations a la fois.
+    """
     if not INFOCLIMAT_API_KEY or not codes:
         return {}
 
@@ -323,11 +372,6 @@ def main():
             file=sys.stderr,
         )
 
-    # Un seul appel Infoclimat pour toutes les stations d'un coup.
-    # On verifie la prevision par rapport a HIER (une journee forcement
-    # terminee), jamais "aujourd'hui" -- sinon, si le script tourne avant
-    # que la Tx du jour ait eu lieu (typiquement 15h-17h), l'observation
-    # serait incomplete et fausserait le biais vers le bas a chaque lancement.
     codes = [s["infoclimat_code"] for s in stations_ok]
     veille = today - timedelta(days=1)
     obs_veille_par_code = fetch_infoclimat_obs_batch(codes, veille)
@@ -355,10 +399,6 @@ def main():
             print(f"  [!] Prevision impossible pour {st['nom']}: {e}", file=sys.stderr)
             continue
 
-        # 2) prevision qui avait ete faite il y a 2 jours pour HIER (relue
-        #    dans l'historique local) + observation reelle d'hier -> biais.
-        #    Hier est toujours une journee complete, quelle que soit l'heure
-        #    a laquelle ce script est lance aujourd'hui.
         prev_fcst_for_veille = None
         if HISTORY_FILE.exists():
             with open(HISTORY_FILE, encoding="utf-8") as f:
@@ -368,9 +408,6 @@ def main():
                             "tn": float(row["prevision_brute_tn"]),
                             "tx": float(row["prevision_brute_tx"]),
                         }
-
-        obs = obs_veille_par_code.get(code)
-        update_bias(bias_store, sid, obs, prev_fcst_for_veille)
 
         obs = obs_veille_par_code.get(code)
         update_bias(bias_store, sid, obs, prev_fcst_for_veille)
