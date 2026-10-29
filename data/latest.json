@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-28",
+  "generated_at": "2026-10-29",
   "zone": {
     "nom": "Gard rhodanien",
     "bbox": {
@@ -15,18 +15,18 @@
       "nom": "Saint-Paul-les-Fonts",
       "lat": 44.084,
       "lon": 4.615,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 8.8,
-        "tx": 17.7
+        "tn": 8.4,
+        "tx": 18.6
       },
       "corrigee": {
-        "tn": 8.2,
-        "tx": 18.4
+        "tn": 7.8,
+        "tx": 19.2
       },
       "biais_applique": {
-        "tn": -0.65,
-        "tx": 0.71
+        "tn": -0.59,
+        "tx": 0.61
       }
     },
     {
@@ -34,18 +34,18 @@
       "nom": "Viviers",
       "lat": 44.485,
       "lon": 4.687,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
         "tn": 6.9,
-        "tx": 15.8
+        "tx": 15.7
       },
       "corrigee": {
-        "tn": 5.6,
-        "tx": 17.7
+        "tn": 5.9,
+        "tx": 17.4
       },
       "biais_applique": {
-        "tn": -1.26,
-        "tx": 1.88
+        "tn": -1.05,
+        "tx": 1.71
       }
     },
     {
@@ -53,18 +53,18 @@
       "nom": "Montjoyer",
       "lat": 44.476,
       "lon": 4.851,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 5.9,
-        "tx": 14.0
+        "tn": 7.4,
+        "tx": 14.9
       },
       "corrigee": {
-        "tn": 4.0,
-        "tx": 15.2
+        "tn": 6.3,
+        "tx": 15.8
       },
       "biais_applique": {
-        "tn": -1.89,
-        "tx": 1.19
+        "tn": -1.14,
+        "tx": 0.95
       }
     },
     {
@@ -72,18 +72,18 @@
       "nom": "Saint-Paul-Trois-Châteaux",
       "lat": 44.349,
       "lon": 4.766,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 9.2,
-        "tx": 16.7
+        "tn": 8.8,
+        "tx": 18.1
       },
       "corrigee": {
-        "tn": 8.5,
-        "tx": 17.6
+        "tn": 8.4,
+        "tx": 18.7
       },
       "biais_applique": {
-        "tn": -0.69,
-        "tx": 0.9
+        "tn": -0.37,
+        "tx": 0.58
       }
     },
     {
@@ -91,14 +91,14 @@
       "nom": "Bourg-Saint-Andéol",
       "lat": 44.376,
       "lon": 4.643,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 8.8,
-        "tx": 16.4
+        "tn": 9.1,
+        "tx": 16.5
       },
       "corrigee": {
-        "tn": 8.8,
-        "tx": 16.4
+        "tn": 9.1,
+        "tx": 16.5
       },
       "biais_applique": {
         "tn": 0.0,
@@ -110,18 +110,18 @@
       "nom": "Dent de Rez",
       "lat": 44.429,
       "lon": 4.502,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 5.4,
-        "tx": 12.0
+        "tn": 6.6,
+        "tx": 12.6
       },
       "corrigee": {
-        "tn": 5.1,
-        "tx": 13.6
+        "tn": 6.5,
+        "tx": 14.0
       },
       "biais_applique": {
-        "tn": -0.33,
-        "tx": 1.6
+        "tn": -0.1,
+        "tx": 1.43
       }
     },
     {
@@ -129,14 +129,14 @@
       "nom": "Rochegude",
       "lat": 44.25,
       "lon": 4.83,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 8.4,
-        "tx": 17.4
+        "tn": 8.3,
+        "tx": 18.4
       },
       "corrigee": {
-        "tn": 8.4,
-        "tx": 17.4
+        "tn": 8.3,
+        "tx": 18.4
       },
       "biais_applique": {
         "tn": 0.0,
@@ -148,18 +148,18 @@
       "nom": "Bollène",
       "lat": 44.289,
       "lon": 4.786,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 9.0,
-        "tx": 17.7
+        "tn": 6.2,
+        "tx": 18.9
       },
       "corrigee": {
-        "tn": 8.0,
-        "tx": 18.6
+        "tn": 5.3,
+        "tx": 19.6
       },
       "biais_applique": {
-        "tn": -1.02,
-        "tx": 0.93
+        "tn": -0.89,
+        "tx": 0.72
       }
     },
     {
@@ -167,14 +167,14 @@
       "nom": "Tulette",
       "lat": 44.283,
       "lon": 4.933,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 8.1,
-        "tx": 17.5
+        "tn": 6.4,
+        "tx": 18.7
       },
       "corrigee": {
-        "tn": 8.1,
-        "tx": 17.5
+        "tn": 6.4,
+        "tx": 18.7
       },
       "biais_applique": {
         "tn": 0.0,
@@ -186,14 +186,14 @@
       "nom": "Orange Centre",
       "lat": 44.137,
       "lon": 4.81,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 8.3,
-        "tx": 18.6
+        "tn": 7.2,
+        "tx": 19.0
       },
       "corrigee": {
-        "tn": 8.3,
-        "tx": 18.6
+        "tn": 7.2,
+        "tx": 19.0
       },
       "biais_applique": {
         "tn": 0.0,
@@ -205,18 +205,18 @@
       "nom": "Sorgues",
       "lat": 44.01,
       "lon": 4.874,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 8.9,
-        "tx": 19.4
+        "tn": 6.9,
+        "tx": 19.7
       },
       "corrigee": {
-        "tn": 10.0,
-        "tx": 19.4
+        "tn": 7.8,
+        "tx": 19.6
       },
       "biais_applique": {
-        "tn": 1.05,
-        "tx": 0.0
+        "tn": 0.92,
+        "tx": -0.15
       }
     },
     {
@@ -224,14 +224,14 @@
       "nom": "Saint-Saturnin-lès-Avignon",
       "lat": 43.955,
       "lon": 4.925,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 8.4,
-        "tx": 19.1
+        "tn": 6.5,
+        "tx": 19.3
       },
       "corrigee": {
-        "tn": 8.4,
-        "tx": 19.1
+        "tn": 6.5,
+        "tx": 19.3
       },
       "biais_applique": {
         "tn": 0.0,
@@ -243,14 +243,14 @@
       "nom": "Saint-Saturnin-lès-Avignon",
       "lat": 43.955,
       "lon": 4.925,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 8.4,
-        "tx": 19.1
+        "tn": 6.5,
+        "tx": 19.3
       },
       "corrigee": {
-        "tn": 8.4,
-        "tx": 19.1
+        "tn": 6.5,
+        "tx": 19.3
       },
       "biais_applique": {
         "tn": 0.0,
@@ -262,18 +262,18 @@
       "nom": "Montaren-et-Saint-Médiers",
       "lat": 44.029,
       "lon": 4.38,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 7.9,
-        "tx": 18.2
+        "tn": 7.1,
+        "tx": 19.1
       },
       "corrigee": {
-        "tn": 7.0,
-        "tx": 18.3
+        "tn": 6.2,
+        "tx": 19.1
       },
       "biais_applique": {
-        "tn": -0.92,
-        "tx": 0.09
+        "tn": -0.86,
+        "tx": 0.02
       }
     },
     {
@@ -281,18 +281,18 @@
       "nom": "Lussan (la Lèque)",
       "lat": 44.189,
       "lon": 4.36,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 6.5,
-        "tx": 17.0
+        "tn": 6.4,
+        "tx": 17.6
       },
       "corrigee": {
-        "tn": 1.4,
-        "tx": 18.4
+        "tn": 1.7,
+        "tx": 18.9
       },
       "biais_applique": {
-        "tn": -5.09,
-        "tx": 1.39
+        "tn": -4.67,
+        "tx": 1.29
       }
     },
     {
@@ -300,18 +300,18 @@
       "nom": "Saint-Hilaire-de-Brethmas",
       "lat": 44.08,
       "lon": 4.125,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 6.7,
-        "tx": 18.3
+        "tn": 7.2,
+        "tx": 19.2
       },
       "corrigee": {
-        "tn": 5.8,
-        "tx": 18.3
+        "tn": 6.8,
+        "tx": 19.1
       },
       "biais_applique": {
-        "tn": -0.86,
-        "tx": -0.01
+        "tn": -0.4,
+        "tx": -0.05
       }
     },
     {
@@ -319,18 +319,18 @@
       "nom": "Malbosc",
       "lat": 44.347,
       "lon": 4.074,
-      "date_prevue": "2026-10-29",
+      "date_prevue": "2026-10-30",
       "brute": {
-        "tn": 6.2,
-        "tx": 15.2
+        "tn": 6.5,
+        "tx": 14.5
       },
       "corrigee": {
         "tn": 6.7,
-        "tx": 16.5
+        "tx": 15.7
       },
       "biais_applique": {
-        "tn": 0.52,
-        "tx": 1.29
+        "tn": 0.17,
+        "tx": 1.24
       }
     }
   ]
